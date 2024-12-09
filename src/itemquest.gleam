@@ -14,6 +14,7 @@ pub fn main() {
   |> dot_env.set_debug(False)
   |> dot_env.load()
 
+
   let assert Ok(secret_key_base) = env.get_string("SECRET_KEY_BASE")
 
   let assert Ok(_) =

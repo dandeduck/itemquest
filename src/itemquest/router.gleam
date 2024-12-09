@@ -1,3 +1,6 @@
+import lustre/element
+import itemquest/pages/layout
+import itemquest/pages/home
 import gleam/http.{Get}
 import gleam/string_tree
 import itemquest/web.{type Context, Authorized}
@@ -15,13 +18,11 @@ pub fn handle_request(req: Request) -> Response {
 
 pub fn home_page(req: Request, ctx: Context) -> Response {
   use <- wisp.require_method(req, Get)
-  let html =
-    string_tree.from_string(
-      "<h1>Hello request_id " <> ctx.request_id <> "</h1>",
-    )
 
-  wisp.ok()
-  |> wisp.html_body(html)
+  home.page()
+  |> layout.layout
+  |> element.to_document_string_builder
+  |> wisp.html_response(200)
 }
 
 pub fn get_items(req: Request, ctx: Context) -> Response {
