@@ -1,6 +1,7 @@
-import lustre/element.{type Element, text}
-import lustre/element/html.{h1}
+import lustre/element/html
+import lustre/attribute
+import lustre/element.{type Element}
 
 pub fn page() -> Element(t) {
-  h1([], [text("Homepage")])
+  html.h1([], [html.text("Homepage"), html.a([attribute.href("/users")], [html.text("click me")])])
 }
