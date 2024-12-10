@@ -1,22 +1,23 @@
-import lustre/element
-import itemquest/pages/layout
-import itemquest/pages/home
 import gleam/http.{Get}
 import gleam/string_tree
-import itemquest/web.{type Context, Authorized}
+import itemquest/contexts.{type RequestContext, type ServerContext, Authorized}
+import itemquest/pages/home
+import itemquest/pages/layout
+import itemquest/web
+import lustre/element
 import wisp.{type Request, type Response}
 
-pub fn handle_request(req: Request) -> Response {
-  use req, ctx <- web.middleware(req)
+pub fn handle_request(req: Request, ctx: ServerContext) -> Response {
+  use req, ctx <- web.middleware(req, ctx)
 
   case wisp.path_segments(req) {
-    [] -> home_page(req, ctx)
+    [] -> home_page(req)
     ["users"] -> get_items(req, ctx)
     _ -> wisp.not_found()
   }
 }
 
-pub fn home_page(req: Request, ctx: Context) -> Response {
+pub fn home_page(req: Request) -> Response {
   use <- wisp.require_method(req, Get)
 
   home.page()
@@ -25,7 +26,7 @@ pub fn home_page(req: Request, ctx: Context) -> Response {
   |> wisp.html_response(200)
 }
 
-pub fn get_items(req: Request, ctx: Context) -> Response {
+pub fn get_items(req: Request, ctx: RequestContext) -> Response {
   use <- wisp.require_method(req, Get)
   use user <- get_user(ctx)
 
@@ -42,7 +43,7 @@ type User {
   User(id: String, name: String)
 }
 
-fn get_user(ctx: Context, handle_user: fn(User) -> Response) -> Response {
+fn get_user(ctx: RequestContext, handle_user: fn(User) -> Response) -> Response {
   case ctx {
     Authorized(_, id) -> handle_user(User(id, "dude"))
     _ -> wisp.response(401)
