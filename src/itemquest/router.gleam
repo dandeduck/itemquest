@@ -1,10 +1,13 @@
 import gleam/http.{Get}
+import gleam/io
 import gleam/string_tree
 import itemquest/contexts.{type RequestContext, type ServerContext, Authorized}
 import itemquest/pages/home
 import itemquest/pages/layout
+import itemquest/sql
 import itemquest/web
 import lustre/element
+import pog
 import wisp.{type Request, type Response}
 
 pub fn handle_request(req: Request, ctx: ServerContext) -> Response {
@@ -34,6 +37,11 @@ pub fn get_items(req: Request, ctx: RequestContext) -> Response {
     string_tree.from_string(
       "<h2> Items for user" <> user.id <> " " <> user.name <> "</h2>",
     )
+  let assert Ok(pog.Returned(_rows_count, rows)) =
+    sql.find_template_market_entry(ctx.db, 123)
+  // let assert [row] = rows
+
+  io.debug(rows)
 
   wisp.ok()
   |> wisp.html_body(html)
@@ -45,7 +53,7 @@ type User {
 
 fn get_user(ctx: RequestContext, handle_user: fn(User) -> Response) -> Response {
   case ctx {
-    Authorized(_, id) -> handle_user(User(id, "dude"))
+    Authorized(_, _, id) -> handle_user(User(id, "dude"))
     _ -> wisp.response(401)
   }
 }

@@ -1,9 +1,10 @@
+import pog.{type Connection}
+
 pub type ServerContext {
-  ServerContext(generated_directory: String)
+  ServerContext(generated_directory: String, db: Connection)
 }
 
 pub type RequestContext {
-  Unauthorized(request_id: String)
-  Authorized(request_id: String, user_id: String)
+  Unauthorized(db: Connection, request_id: String)
+  Authorized(db: Connection, request_id: String, user_id: String)
 }
-

@@ -1,5 +1,9 @@
+# gleam
 *.beam
 *.ez
 /build
 erl_crash.dump
+
+# secrets
 .env
+.sqllsrc.json

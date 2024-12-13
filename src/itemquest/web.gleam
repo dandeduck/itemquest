@@ -8,17 +8,17 @@ import wisp.{type Request, type Response}
 
 pub fn middleware(
   req: Request,
-  server_context: ServerContext,
+  server_ctx: ServerContext,
   handle_request: fn(Request, RequestContext) -> Response,
 ) -> Response {
   let req = wisp.method_override(req)
 
-  use ctx <- create_context(req)
+  use ctx <- create_context(req, server_ctx)
 
   use <- wisp.serve_static(
     req,
     under: "/generated",
-    from: server_context.generated_directory,
+    from: server_ctx.generated_directory,
   )
   use <- wisp.serve_static(req, under: "/static", from: "/public")
   use <- log_request(req, ctx)
@@ -53,9 +53,10 @@ const test_user_id = "kjsdnfukyh2873h2uifhusgefhisdf"
 
 fn create_context(
   _req: Request,
+  server_ctx: ServerContext,
   handle_request: fn(RequestContext) -> Response,
 ) -> Response {
-  let context = Authorized(request_id(), test_user_id)
+  let context = Authorized(server_ctx.db, request_id(), test_user_id)
 
   handle_request(context)
 }

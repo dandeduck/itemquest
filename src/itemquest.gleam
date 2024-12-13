@@ -1,9 +1,11 @@
 import dot_env
 import dot_env/env
 import gleam/erlang/process
-import itemquest/router
+import gleam/result
 import itemquest/contexts.{ServerContext}
+import itemquest/router
 import mist
+import pog.{type Connection}
 import wisp
 import wisp/wisp_mist
 
@@ -16,8 +18,11 @@ pub fn main() {
   |> dot_env.load()
 
   let assert Ok(secret_key_base) = env.get_string("SECRET_KEY_BASE")
+  let assert Ok(db_url) = env.get_string("DATABASE_URL")
 
-  let ctx = ServerContext(generated_directory: generated_directory())
+  let assert Ok(db) = connect_db(db_url)
+
+  let ctx = ServerContext(generated_directory(), db)
 
   let assert Ok(_) =
     wisp_mist.handler(router.handle_request(_, ctx), secret_key_base)
@@ -31,4 +36,11 @@ pub fn main() {
 fn generated_directory() {
   let assert Ok(priv_directory) = wisp.priv_directory("itemquest")
   priv_directory <> "/static"
+}
+
+fn connect_db(url: String) -> Result(Connection, Nil) {
+  use config <- result.try(pog.url_config(url))
+  config
+  |> pog.connect
+  |> Ok
 }

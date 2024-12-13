@@ -27,7 +27,7 @@ fn turbo_scripts() -> List(Element(t)) {
       [attribute.type_("importmap")],
       " {
             \"imports\": {
-                \"turbo\": \"https://unpkg.com/@hotwired/turbo@8.0.10/dist/turbo.es2017-esm.js\",
+                \"turbo\": \"https://unpkg.com/@hotwired/turbo@8.0.10/dist/turbo.es2017-esm.js\"
             }
         }",
     ),
