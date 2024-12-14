@@ -11,7 +11,7 @@ import pog
 pub type FindTemplateMarketEntryRow {
   FindTemplateMarketEntryRow(
     template_id: Int,
-    quantity: Option(Int),
+    quantity: Int,
     price: Option(Int),
     name: String,
   )
@@ -25,7 +25,7 @@ pub type FindTemplateMarketEntryRow {
 pub fn find_template_market_entry(db, arg_1) {
   let decoder = {
     use template_id <- zero.field(0, zero.int)
-    use quantity <- zero.field(1, zero.optional(zero.int))
+    use quantity <- zero.field(1, zero.int)
     use price <- zero.field(2, zero.optional(zero.int))
     use name <- zero.field(3, zero.string)
     zero.success(
@@ -34,9 +34,9 @@ pub fn find_template_market_entry(db, arg_1) {
   }
 
   let query = "-- Find template market entry by template_id
-SELECT template_market_entries.*, item_templates.name
+SELECT template_market_entries.*, templates.name
 FROM template_market_entries 
-INNER JOIN item_templates ON template_market_entries.template_id=item_templates.template_id
+INNER JOIN templates ON template_market_entries.template_id=templates.template_id
 WHERE template_market_entries.template_id = $1
 "
 

@@ -5,7 +5,7 @@ import pog.{type QueryError}
 
 pub fn create_market_entry(
   ctx: RequestContext,
-  template_id: Int,
+  template_id: In,
 ) -> Result(Nil, QueryError) {
   use _ <- result.try(sql.insert_template_market_entry(ctx.db, template_id))
 

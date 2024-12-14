@@ -1,5 +1,5 @@
 import wisp
-import itemquest/contexts.{type RequestContext}
+import itemquest/web/contexts.{type RequestContext}
 
 pub fn log_info(message: String, ctx: RequestContext) -> Nil {
   wisp.log_info(ctx.request_id <> message)

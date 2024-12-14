@@ -1,13 +1,12 @@
-import gleam/http.{Get}
-import gleam/io
+import gleam/http
 import gleam/string_tree
-import itemquest/contexts.{type RequestContext, type ServerContext, Authorized}
 import itemquest/pages/home
 import itemquest/pages/layout
-import itemquest/sql
 import itemquest/web
+import itemquest/web/contexts.{
+  type RequestContext, type ServerContext,
+}
 import lustre/element
-import pog
 import wisp.{type Request, type Response}
 
 pub fn handle_request(req: Request, ctx: ServerContext) -> Response {
@@ -21,7 +20,7 @@ pub fn handle_request(req: Request, ctx: ServerContext) -> Response {
 }
 
 pub fn home_page(req: Request) -> Response {
-  use <- wisp.require_method(req, Get)
+  use <- wisp.require_method(req, http.Get)
 
   home.page()
   |> layout.layout
@@ -30,18 +29,13 @@ pub fn home_page(req: Request) -> Response {
 }
 
 pub fn get_items(req: Request, ctx: RequestContext) -> Response {
-  use <- wisp.require_method(req, Get)
+  use <- wisp.require_method(req, http.Get)
   use user <- get_user(ctx)
 
   let html =
     string_tree.from_string(
       "<h2> Items for user" <> user.id <> " " <> user.name <> "</h2>",
     )
-  let assert Ok(pog.Returned(_rows_count, rows)) =
-    sql.find_template_market_entry(ctx.db, 123)
-  // let assert [row] = rows
-
-  io.debug(rows)
 
   wisp.ok()
   |> wisp.html_body(html)
@@ -53,7 +47,7 @@ type User {
 
 fn get_user(ctx: RequestContext, handle_user: fn(User) -> Response) -> Response {
   case ctx {
-    Authorized(_, _, id) -> handle_user(User(id, "dude"))
+    contexts.Authorized(_, _, id) -> handle_user(User(id, "dude"))
     _ -> wisp.response(401)
   }
 }

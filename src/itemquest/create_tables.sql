@@ -1,17 +1,26 @@
-DROP TABLE IF EXISTS template_market_entries, items, item_templates;
+DROP TABLE IF EXISTS template_market_entries, items, templates;
+DROP TYPE IF EXISTS template_status;
 
-CREATE TABLE item_templates (
+CREATE TYPE template_status AS enum (
+    'published',
+    'unpublished'
+);
+
+CREATE TABLE templates (
     template_id serial PRIMARY KEY, 
-    name varchar(32) NOT NULL
+    status template_status NOT NULL DEFAULT 'unpublished',
+    name varchar(32) NOT NULL,
+    created_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE items (
     item_id serial PRIMARY KEY, 
-    template_id serial REFERENCES item_templates
+    template_id serial REFERENCES templates,
+    created_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE template_market_entries (
-    template_id serial PRIMARY KEY REFERENCES item_templates, 
-    quantity integer CHECK (quantity > 0),
+    template_id serial PRIMARY KEY REFERENCES templates, 
+    quantity integer NOT NULL DEFAULT 0 CHECK (quantity > 0),
     price integer CHECK (price > 0)
 );

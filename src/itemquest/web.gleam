@@ -1,7 +1,7 @@
 import gleam/http
 import gleam/int
 import gleam/string
-import itemquest/contexts.{type RequestContext, type ServerContext, Authorized}
+import itemquest/web/contexts.{type RequestContext, type ServerContext}
 import itemquest/utils/ids
 import itemquest/utils/logging
 import wisp.{type Request, type Response}
@@ -56,7 +56,7 @@ fn create_context(
   server_ctx: ServerContext,
   handle_request: fn(RequestContext) -> Response,
 ) -> Response {
-  let context = Authorized(server_ctx.db, request_id(), test_user_id)
+  let context = contexts.Authorized(server_ctx.db, request_id(), test_user_id)
 
   handle_request(context)
 }
