@@ -1,8 +1,8 @@
+import itemquest/web/contexts
 import dot_env
 import dot_env/env
 import gleam/erlang/process
 import gleam/result
-import itemquest/contexts.{ServerContext}
 import itemquest/router
 import mist
 import pog.{type Connection}
@@ -22,7 +22,7 @@ pub fn main() {
 
   let assert Ok(db) = connect_db(db_url)
 
-  let ctx = ServerContext(generated_directory(), db)
+  let ctx = contexts.ServerContext(generated_directory(), db)
 
   let assert Ok(_) =
     wisp_mist.handler(router.handle_request(_, ctx), secret_key_base)
