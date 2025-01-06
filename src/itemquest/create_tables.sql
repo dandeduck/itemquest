@@ -9,7 +9,8 @@ CREATE TYPE template_status AS enum (
 CREATE TABLE templates (
     template_id serial PRIMARY KEY, 
     status template_status NOT NULL DEFAULT 'unpublished',
-    name varchar(32) NOT NULL,
+    name varchar(31) NOT NULL,
+    image_url varchar(255),
     created_at timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -23,4 +24,9 @@ CREATE TABLE template_market_entries (
     template_id serial PRIMARY KEY REFERENCES templates, 
     quantity integer NOT NULL DEFAULT 0 CHECK (quantity > 0),
     price integer CHECK (price > 0)
+);
+
+CREATE TABLE waitlist_emails (
+    address varchar(255) PRIMARY KEY,
+    created_at timestamp DEFAULT CURRENT_TIMESTAMP
 );

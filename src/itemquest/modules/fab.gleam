@@ -7,9 +7,7 @@ pub fn create_template(
   ctx: RequestContext,
   name: String,
 ) -> Result(Int, InternalError) {
-  let result = sql.insert_template(ctx.db, name)
-
-  case result {
+  case sql.insert_template(ctx.db, name) {
     Ok(pog.Returned(_, rows)) -> {
       let assert [row] = rows
       Ok(row.template_id)

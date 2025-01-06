@@ -1,22 +1,51 @@
 import gleam/http
-import gleam/string_tree
+import gleam/io
+import gleam/list
 import itemquest/pages/home
 import itemquest/pages/layout
+import itemquest/pages/market
+import itemquest/pages/waitlist
 import itemquest/web
-import itemquest/web/contexts.{
-  type RequestContext, type ServerContext,
-}
+import itemquest/web/contexts.{type RequestContext, type ServerContext}
 import lustre/element
 import wisp.{type Request, type Response}
 
 pub fn handle_request(req: Request, ctx: ServerContext) -> Response {
-  use req, ctx <- web.middleware(req, ctx)
+  use req, _ctx <- web.middleware(req, ctx)
 
   case wisp.path_segments(req) {
-    [] -> home_page(req)
-    ["users"] -> get_items(req, ctx)
-    _ -> wisp.not_found()
+    [] -> waitlist_page(req)
+    ["waitlist"] -> handle_waitlist(req)
+    //   ["markets", id] -> market_page(id, req, ctx)
+    _ -> wisp.redirect("/")
   }
+}
+
+pub fn handle_waitlist(req) {
+  use <- wisp.require_method(req, http.Post)
+  use data <- wisp.require_form(req)
+
+  let email = list.key_find(data.values, "email")
+
+  case email {
+    Ok(email) -> io.debug(email)
+    _ -> ""
+  }
+
+  // todo: return just the updated compent that replaces the form 
+  waitlist.page()
+  |> layout.layout
+  |> element.to_document_string_builder
+  |> wisp.html_response(200)
+}
+
+pub fn waitlist_page(req: Request) -> Response {
+  use <- wisp.require_method(req, http.Get)
+
+  waitlist.page()
+  |> layout.layout
+  |> element.to_document_string_builder
+  |> wisp.html_response(200)
 }
 
 pub fn home_page(req: Request) -> Response {
@@ -28,26 +57,20 @@ pub fn home_page(req: Request) -> Response {
   |> wisp.html_response(200)
 }
 
-pub fn get_items(req: Request, ctx: RequestContext) -> Response {
+pub fn market_page(
+  market_id: String,
+  req: Request,
+  _ctx: RequestContext,
+) -> Response {
   use <- wisp.require_method(req, http.Get)
-  use user <- get_user(ctx)
 
-  let html =
-    string_tree.from_string(
-      "<h2> Items for user" <> user.id <> " " <> user.name <> "</h2>",
-    )
+  // let query = wisp.get_query(req)
+  // let sort_by = list.find(query, fn(param) { param.0 == "sort_by" })
+  // let limit = list.find(query, fn(param) { param.0 == "limit" })
+  // let offset = list.find(query, fn(param) { param.0 == "offset" })
 
-  wisp.ok()
-  |> wisp.html_body(html)
-}
-
-type User {
-  User(id: String, name: String)
-}
-
-fn get_user(ctx: RequestContext, handle_user: fn(User) -> Response) -> Response {
-  case ctx {
-    contexts.Authorized(_, _, id) -> handle_user(User(id, "dude"))
-    _ -> wisp.response(401)
-  }
+  market.page("Market " <> market_id)
+  |> layout.layout
+  |> element.to_document_string_builder
+  |> wisp.html_response(200)
 }
