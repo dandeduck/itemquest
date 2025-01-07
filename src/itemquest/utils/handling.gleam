@@ -1,5 +1,7 @@
+import gleam/http/response
 import gleam/int
 import gleam/list
+import gleam/string_tree.{type StringTree}
 import wisp.{type FormData, type Response}
 
 pub fn require_form_key(
@@ -42,3 +44,12 @@ pub fn require_int_string(
   }
 }
 
+pub fn turbo_stream_html_response(body: StringTree, status: Int) -> Response {
+  body
+  |> wisp.Text
+  |> response.Response(
+    status,
+    [#("content-type", "text/vnd.turbo-stream.html")],
+    _,
+  )
+}

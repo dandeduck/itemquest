@@ -75,12 +75,7 @@ pub fn handle_get_market_entries(
     Ok(entries) ->
       ui.market_rows(entries)
       |> element.to_document_string_builder
-      |> wisp.Text
-      |> response.Response(
-        200,
-        [#("content-type", "text/vnd.turbo-stream.html")],
-        _,
-      )
+      |> handling.turbo_stream_html_response(200)
     // todo: show error instead
     Error(_) -> wisp.internal_server_error()
   }
