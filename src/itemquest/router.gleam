@@ -11,7 +11,8 @@ pub fn handle_request(req: Request, ctx: ServerContext) -> Response {
     [] -> waitlist.handle_get_waitlist(req)
     ["waitlist"] -> waitlist.handle_post_waitlist(req, ctx)
     ["markets", id] -> market.handle_get_market_by_id(id, req, ctx)
-    _ -> wisp.redirect("/") // todo: return 404 page
+    ["markets", id, "entries"] -> market.handle_get_market_entries(id, req, ctx)
+    _ -> wisp.redirect("/")
+    // todo: return 404 page
   }
 }
-

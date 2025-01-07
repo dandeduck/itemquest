@@ -31,29 +31,28 @@ pub fn page() -> Element(t) {
     html.h2([], [
       html.text("Be one of the first games to join! Enter the waitlist"),
     ]),
-    ui.turbo_frame("waitlist_form", [], [
-      html.form(
-        [
-          attribute.enctype("multipart/form-data"),
-          attribute.action("/waitlist"),
-          attribute.method("post"),
-          attribute.class("flex"),
-        ],
-        [
-          html.input([
-            attribute.type_("email"),
-            attribute.name("email"),
-            attribute.required(True),
-            attribute.placeholder("contact@itemquest.gg"),
-          ]),
-          html.button(
-            [
-              attribute.type_("submit"),
-            ],
-            [html.text("Submit")],
-          ),
-        ],
-      ),
-    ]),
+    ui.turbo_frame(
+      [],
+      [
+        html.form(
+          [
+            attribute.enctype("multipart/form-data"),
+            attribute.action("/waitlist"),
+            attribute.method("post"),
+            attribute.class("flex"),
+          ],
+          [
+            html.input([
+              attribute.type_("email"),
+              attribute.name("email"),
+              attribute.required(True),
+              attribute.placeholder("contact@itemquest.gg"),
+            ]),
+            html.button([attribute.type_("submit")], [html.text("Submit")]),
+          ],
+        ),
+      ],
+      id: "waitlist_form",
+    ),
   ])
 }
