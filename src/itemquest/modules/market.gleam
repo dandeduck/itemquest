@@ -32,13 +32,14 @@ pub fn handle_get_market_by_id(
       ctx,
     )
   {
-    Ok(_entries) ->
-      ui.page(market.name)
+    Ok(entries) ->
+      ui.page(market, entries)
       |> layout.layout
       |> element.to_document_string_builder
       |> wisp.html_response(200)
+      // todo: show error instead
     Error(_) ->
-      ui.page(market.name)
+      ui.page(market, [])
       |> layout.layout
       |> element.to_document_string_builder
       |> wisp.html_response(500)
@@ -53,10 +54,6 @@ fn require_market(
   case internal.select_market(market_id, ctx) {
     Ok(market) -> handle_market(market)
     // todo: handle not found 404 vs 500 error and render different content than the page
-    Error(_) ->
-      ui.page("")
-      |> layout.layout
-      |> element.to_document_string_builder
-      |> wisp.html_response(500)
+    Error(_) -> wisp.bad_request()
   }
 }

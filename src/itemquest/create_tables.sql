@@ -36,7 +36,7 @@ CREATE TABLE item_instances (
 
 CREATE TABLE market_entries (
     item_id   serial PRIMARY KEY REFERENCES items, 
-    quantity  integer NOT NULL DEFAULT 0 CHECK (quantity > 0),
+    quantity  integer NOT NULL DEFAULT 0 CHECK (quantity >= 0),
     price     integer CHECK (price > 0)
 );
 
