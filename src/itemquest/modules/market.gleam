@@ -1,19 +1,33 @@
+import itemquest/modules/market/ui
+import gleam/http
 import itemquest/modules/market/sql.{type SelectTemplateMarketEntriesRow}
+import itemquest/utils/handling
+import itemquest/utils/ui/layout
 import itemquest/web/contexts.{type RequestContext}
 import itemquest/web/errors.{type InternalError}
+import lustre/element
 import pog
+import wisp.{type Request, type Response}
 
-pub fn create_market_entry(
-  ctx: RequestContext,
-  template_id: Int,
-) -> Result(Nil, InternalError(t)) {
-  case sql.insert_template_market_entry(ctx.db, template_id) {
-    Ok(_) -> Ok(Nil)
-    Error(error) -> error |> errors.from_query_error |> Error
-  }
+pub fn handle_get_market_by_id(
+  market_id: String,
+  req: Request,
+  _ctx: RequestContext,
+) -> Response {
+  use <- wisp.require_method(req, http.Get)
+
+  let query = wisp.get_query(req)
+  use _sort_by <- handling.require_query_key(query, "sort_by")
+  use _limit <- handling.require_query_key(query, "limit")
+  use _offset <- handling.require_query_key(query, "offset")
+
+  ui.page("Market " <> market_id)
+  |> layout.layout
+  |> element.to_document_string_builder
+  |> wisp.html_response(200)
 }
 
-pub fn select_market_entries(
+fn select_market_entries(
   ctx: RequestContext,
   sort_by: String,
   limit: Int,

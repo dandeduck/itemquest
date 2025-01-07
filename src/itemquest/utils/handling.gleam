@@ -9,6 +9,10 @@ pub fn require_form_key(
   require_list_key(form.values, name, handle_request)
 }
 
+pub fn require_query_key(query: List(#(String, String)), name: String, handle_request: fn(String) -> Response) -> Response {
+  require_list_key(query, name, handle_request)
+}
+
 fn require_list_key(
   values: List(#(String, String)),
   name: String,

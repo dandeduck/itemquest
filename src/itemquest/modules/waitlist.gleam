@@ -1,14 +1,14 @@
 import itemquest/utils/handling
+import itemquest/utils/ui/layout
 import gleam/http
 import itemquest/modules/waitlist/internal
 import itemquest/modules/waitlist/ui
-import itemquest/pages/layout
 import itemquest/web/contexts.{type RequestContext}
 import itemquest/web/errors
 import lustre/element
 import wisp.{type Request, type Response}
 
-pub fn post_waitlist(req: Request, ctx: RequestContext) -> Response {
+pub fn handle_post_waitlist(req: Request, ctx: RequestContext) -> Response {
   use <- wisp.require_method(req, http.Post)
   use data <- wisp.require_form(req)
   use email <- handling.require_form_key(data, "email")
@@ -36,7 +36,7 @@ pub fn post_waitlist(req: Request, ctx: RequestContext) -> Response {
   }
 }
 
-pub fn get_waitlist(req: Request) -> Response {
+pub fn handle_get_waitlist(req: Request) -> Response {
   use <- wisp.require_method(req, http.Get)
 
   ui.page()

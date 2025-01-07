@@ -30,3 +30,4 @@ fn market_row() -> Element(t) {
     html.th([], [html.text("Price")]),
   ])
 }
+
