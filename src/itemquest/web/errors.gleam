@@ -5,6 +5,16 @@ pub type InternalError(t) {
   Operational(message: String)
 }
 
+pub fn try_query(
+  result: Result(pog.Returned(t), QueryError),
+  handle_returned: fn(Int, List(t)) -> Result(r, InternalError(e)),
+) -> Result(r, InternalError(e)) {
+  case result {
+    Ok(pog.Returned(length, rows)) -> handle_returned(length, rows)
+    Error(error) -> error |> from_query_error |> Error
+  }
+}
+
 pub fn from_query_error(error: QueryError) -> InternalError(t) {
   error
   |> query_error_message

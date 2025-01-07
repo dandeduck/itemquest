@@ -1,6 +1,7 @@
+import itemquest/modules/market
 import itemquest/modules/waitlist
 import itemquest/web
-import itemquest/web/contexts.{type RequestContext, type ServerContext}
+import itemquest/web/contexts.{type ServerContext}
 import wisp.{type Request, type Response}
 
 pub fn handle_request(req: Request, ctx: ServerContext) -> Response {
@@ -9,8 +10,8 @@ pub fn handle_request(req: Request, ctx: ServerContext) -> Response {
   case wisp.path_segments(req) {
     [] -> waitlist.handle_get_waitlist(req)
     ["waitlist"] -> waitlist.handle_post_waitlist(req, ctx)
-    //   ["markets", id] -> market_page(id, req, ctx)
-    _ -> wisp.redirect("/")
+    ["markets", id] -> market.handle_get_market_by_id(id, req, ctx)
+    _ -> wisp.redirect("/") // todo: return 404 page
   }
 }
 

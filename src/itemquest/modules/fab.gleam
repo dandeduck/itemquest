@@ -1,17 +1,14 @@
 import itemquest/modules/fab/sql
 import itemquest/web/contexts.{type RequestContext}
 import itemquest/web/errors.{type InternalError}
-import pog
 
-pub fn create_template(
+pub fn create_item(
   ctx: RequestContext,
+  market_id: Int,
   name: String,
 ) -> Result(Int, InternalError(t)) {
-  case sql.insert_template(ctx.db, name) {
-    Ok(pog.Returned(_, rows)) -> {
-      let assert [row] = rows
-      Ok(row.template_id)
-    }
-    Error(error) -> error |> errors.from_query_error |> Error
-  }
+  use _, rows <- errors.try_query(sql.insert_item(ctx.db, market_id, name))
+  let assert [row] = rows
+
+  Ok(row.item_id)
 }
