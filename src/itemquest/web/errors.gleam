@@ -1,15 +1,14 @@
 import pog.{type QueryError}
 
-pub type InternalError {
-  Business(message: String)
+pub type InternalError(t) {
+  Business(message: String, data: t)
   Operational(message: String)
 }
 
-pub fn from_query_error(error: QueryError) -> Result(t, InternalError) {
+pub fn from_query_error(error: QueryError) -> InternalError(t) {
   error
   |> query_error_message
   |> Operational
-  |> Error
 }
 
 fn query_error_message(error: QueryError) -> String {

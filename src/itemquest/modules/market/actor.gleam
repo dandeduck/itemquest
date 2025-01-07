@@ -29,7 +29,7 @@ fn handle_message(
 }
 
 fn handle_result(
-  result: Result(t, InternalError),
+  result: Result(t, InternalError(t)),
   ctx: RequestContext,
   message: MarketMessage,
   failed_messages: List(MarketMessage),

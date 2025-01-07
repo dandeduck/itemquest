@@ -6,12 +6,12 @@ import pog
 pub fn create_template(
   ctx: RequestContext,
   name: String,
-) -> Result(Int, InternalError) {
+) -> Result(Int, InternalError(t)) {
   case sql.insert_template(ctx.db, name) {
     Ok(pog.Returned(_, rows)) -> {
       let assert [row] = rows
       Ok(row.template_id)
     }
-    Error(error) -> errors.from_query_error(error)
+    Error(error) -> error |> errors.from_query_error |> Error
   }
 }
