@@ -37,12 +37,12 @@ pub type SelectMarketEntriesRow {
   )
 }
 
-/// Select market entries with (market_id, order_query, limit, offset)
+/// Select market entries with (market_id, sort_by, sort_direction, limit, offset)
 ///
 /// > 🐿️ This function was generated automatically using v2.0.5 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
-pub fn select_market_entries(db, arg_1, arg_2, arg_3, arg_4) {
+pub fn select_market_entries(db, arg_1, arg_2, arg_3, arg_4, arg_5) {
   let decoder = {
     use item_id <- zero.field(0, zero.int)
     use quantity <- zero.field(1, zero.int)
@@ -54,20 +54,25 @@ pub fn select_market_entries(db, arg_1, arg_2, arg_3, arg_4) {
     )
   }
 
-  let query = "-- Select market entries with (market_id, order_query, limit, offset)
+  let query = "-- Select market entries with (market_id, sort_by, sort_direction, limit, offset)
 SELECT market_entries.*, items.name, items.image_url
 FROM items 
 INNER JOIN market_entries ON items.item_id=market_entries.item_id
 WHERE items.market_id = $1
-ORDER BY $2
-LIMIT $3 OFFSET $4;
+ORDER BY 
+    (CASE WHEN $3 = 'ASC' AND $2 = 'price' THEN market_entries.price END) ASC,
+    (CASE WHEN $3 = 'DESC' AND $2 = 'price' THEN market_entries.price END) DESC,
+    (CASE WHEN $3 = 'ASC' AND $2 = 'quantity' THEN market_entries.quantity END) ASC,
+    (CASE WHEN $3 = 'DESC' AND $2 = 'quantity' THEN market_entries.quantity END) DESC
+LIMIT $4 OFFSET $5;
 "
 
   pog.query(query)
   |> pog.parameter(pog.int(arg_1))
   |> pog.parameter(pog.text(arg_2))
-  |> pog.parameter(pog.int(arg_3))
+  |> pog.parameter(pog.text(arg_3))
   |> pog.parameter(pog.int(arg_4))
+  |> pog.parameter(pog.int(arg_5))
   |> pog.returning(zero.run(_, decoder))
   |> pog.execute(db)
 }

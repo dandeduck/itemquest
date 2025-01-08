@@ -58,16 +58,16 @@ pub fn handle_get_market_entries(
   use <- wisp.require_method(req, http.Get)
   let query = wisp.get_query(req)
   let sort_by = handling.optional_list_key(query, "sort_by", "quantity")
-  let order_direction =
-    handling.optional_list_key(query, "order_direction", "desc")
+  let sort_direction =
+    handling.optional_list_key(query, "sort_direction", "desc")
   let limit = handling.optional_list_key(query, "limit", "25")
   let offset = handling.optional_list_key(query, "offset", "0")
 
   use market_id <- handling.require_int_string(market_id)
   use sort_by <- handling.require_list_key(internal.sort_by_touples, sort_by)
-  use order_direction <- handling.require_list_key(
-    internal.order_direction_touples,
-    order_direction,
+  use sort_direction <- handling.require_list_key(
+    internal.sort_direction_touples,
+    sort_direction,
   )
   use limit <- handling.require_int_string(limit)
   use offset <- handling.require_int_string(offset)
@@ -75,7 +75,7 @@ pub fn handle_get_market_entries(
   io.debug(internal.MarketEntriesSearch(
     market_id:,
     sort_by:,
-    order_direction:,
+    sort_direction:,
     limit:,
     offset:,
   ))
@@ -85,7 +85,7 @@ pub fn handle_get_market_entries(
       internal.MarketEntriesSearch(
         market_id:,
         sort_by:,
-        order_direction:,
+        sort_direction:,
         limit:,
         offset:,
       ),

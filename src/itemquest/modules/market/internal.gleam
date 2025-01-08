@@ -42,40 +42,41 @@ pub type MarketEntriesSearch {
   MarketEntriesSearch(
     market_id: Int,
     sort_by: MarketEntriesSortBy,
-    order_direction: OrderDirection,
+    sort_direction: SortDirection,
     limit: Int,
     offset: Int,
   )
 }
 
-pub const order_direction_touples = [
-  #("asc", AscendingOrder), #("desc", DescendingOrder),
+pub const sort_direction_touples = [
+  #("asc", AscendingSort), #("desc", DescendingSort),
 ]
 
-pub type OrderDirection {
-  AscendingOrder
-  DescendingOrder
+pub type SortDirection {
+  AscendingSort
+  DescendingSort
 }
 
 pub fn get_market_entries(
   search: MarketEntriesSearch,
   ctx: RequestContext,
 ) -> Result(List(SelectMarketEntriesRow), InternalError(t)) {
-  let order_direction = case search.order_direction {
-    AscendingOrder -> "ASC"
-    DescendingOrder -> "DESC"
+  let sort_by = case search.sort_by {
+    SortByPrice -> "price"
+    SortByQuantity -> "quantity"
   }
-  let order_query = case search.sort_by {
-    SortByPrice -> "market_entries.price " <> order_direction
-    SortByQuantity -> "market_entries.quantity " <> order_direction
+  let sort_direction = case search.sort_direction {
+    AscendingSort -> "ASC"
+    DescendingSort -> "DESC"
   }
 
-  io.debug(order_query)
+  io.debug(sort_direction <> sort_by)
 
   use _, rows <- errors.try_query(sql.select_market_entries(
     ctx.db,
     search.market_id,
-    "market_entries.quantity",
+    sort_by,
+    sort_direction,
     search.limit,
     search.offset,
   ))
