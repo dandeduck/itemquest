@@ -1,3 +1,4 @@
+import gleam/io
 import itemquest/modules/market/sql.{
   type SelectMarketEntriesRow, type SelectMarketRow,
 }
@@ -41,24 +42,40 @@ pub type MarketEntriesSearch {
   MarketEntriesSearch(
     market_id: Int,
     sort_by: MarketEntriesSortBy,
+    order_direction: OrderDirection,
     limit: Int,
     offset: Int,
   )
+}
+
+pub const order_direction_touples = [
+  #("asc", AscendingOrder), #("desc", DescendingOrder),
+]
+
+pub type OrderDirection {
+  AscendingOrder
+  DescendingOrder
 }
 
 pub fn get_market_entries(
   search: MarketEntriesSearch,
   ctx: RequestContext,
 ) -> Result(List(SelectMarketEntriesRow), InternalError(t)) {
-  let sort_by = case search.sort_by {
-    SortByPrice -> "price"
-    SortByQuantity -> "quantity"
+  let order_direction = case search.order_direction {
+    AscendingOrder -> "ASC"
+    DescendingOrder -> "DESC"
   }
+  let order_query = case search.sort_by {
+    SortByPrice -> "market_entries.price " <> order_direction
+    SortByQuantity -> "market_entries.quantity " <> order_direction
+  }
+
+  io.debug(order_query)
 
   use _, rows <- errors.try_query(sql.select_market_entries(
     ctx.db,
     search.market_id,
-    sort_by,
+    "market_entries.quantity",
     search.limit,
     search.offset,
   ))

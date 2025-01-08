@@ -37,7 +37,7 @@ pub type SelectMarketEntriesRow {
   )
 }
 
-/// Select market entries with (market_id, sort_by, limit, offset)
+/// Select market entries with (market_id, order_query, limit, offset)
 ///
 /// > 🐿️ This function was generated automatically using v2.0.5 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
@@ -54,7 +54,7 @@ pub fn select_market_entries(db, arg_1, arg_2, arg_3, arg_4) {
     )
   }
 
-  let query = "-- Select market entries with (market_id, sort_by, limit, offset)
+  let query = "-- Select market entries with (market_id, order_query, limit, offset)
 SELECT market_entries.*, items.name, items.image_url
 FROM items 
 INNER JOIN market_entries ON items.item_id=market_entries.item_id

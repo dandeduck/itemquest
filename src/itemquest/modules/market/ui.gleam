@@ -1,3 +1,4 @@
+import gleam/float
 import gleam/int
 import gleam/list
 import gleam/option
@@ -20,17 +21,23 @@ pub fn page(market: SelectMarketRow, market_entries_uri: String) -> Element(t) {
     ]),
     html.table([attribute.class("w-full")], [
       html.tbody([attribute.id(market_rows_container_id)], [
-        html.tr([attribute.class("text-start")], [
-          html.th([], [html.text("Image")]),
-          html.th([], [html.text("Item name")]),
-          html.th([], [html.text("Quantity")]),
-          html.th([], [html.text("Popularity")]),
-          html.th([], [html.text("Price")]),
-        ]),
+        html.tr(
+          [
+            attribute.class(
+              "[&>*]:text-start [&>:not(:last-child)]:pr-10 [&>*]:border-b-8 [&>*]:border-white",
+            ),
+          ],
+          [
+            html.th([attribute.class("w-0")], [html.text("Image")]),
+            html.th([], [html.text("Item name")]),
+            html.th([attribute.class("w-0")], [html.text("Quantity")]),
+            html.th([attribute.class("w-0")], [html.text("Popularity")]),
+            html.th([attribute.class("w-10")], [html.text("Price")]),
+          ],
+        ),
         ui.eager_loading_frame(
           [attribute.attribute("data-turbo-stream", "true")],
-          id: "",
-          // todo
+          id: "_",
           load_from: market_entries_uri,
         ),
       ]),
@@ -48,16 +55,29 @@ pub fn market_rows(entries: List(SelectMarketEntriesRow)) -> Element(t) {
 }
 
 fn market_row(entry: SelectMarketEntriesRow) -> Element(t) {
-  html.tr([attribute.class("text-start")], [
-    html.th([], [html.text("Image")]),
-    html.th([], [html.text(entry.name)]),
-    html.th([], [html.text(int.to_string(entry.quantity))]),
-    html.th([], [html.text("0")]),
-    html.th([], [
-      html.text(case entry.price {
-        option.Some(price) -> int.to_string(price)
-        _ -> "-"
-      }),
-    ]),
-  ])
+  html.tr(
+    [
+      attribute.class(
+        "[&>*]:text-start [&>:not(:last-child)]:pr-10 [&>*]:p-2 [&>*]:border-y-8 [&>*]:border-white bg-gray",
+      ),
+    ],
+    [
+      html.th([], [
+        case entry.image_url {
+          option.Some(image_url) ->
+            html.img([attribute.src(image_url), attribute.class("h-10")])
+          _ -> html.text("")
+        },
+      ]),
+      html.th([], [html.text(entry.name)]),
+      html.th([], [html.text(int.to_string(entry.quantity))]),
+      html.th([], [html.text("0")]),
+      html.th([], [
+        html.text(case entry.price {
+          option.Some(price) -> float.to_string(int.to_float(price) /. 100.0)
+          _ -> "-"
+        }),
+      ]),
+    ],
+  )
 }
