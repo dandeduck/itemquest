@@ -10,10 +10,20 @@ pub fn layout(page: Element(t)) -> Element(t) {
         attribute.name("viewport"),
         attribute.attribute("content", "width=device-width, initial-scale=1"),
       ]),
+      icons(),
       tailwind(),
       ..turbo_scripts()
     ]),
     html.body([attribute.class("text-black bg-white")], [header(), main(page)]),
+  ])
+}
+
+fn icons() -> Element(t) {
+  html.link([
+    attribute.rel("stylesheet"),
+    attribute.href(
+      "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=arrow_drop_down",
+    ),
   ])
 }
 

@@ -32,7 +32,7 @@ pub fn handle_get_market_by_id(
   use market_id <- handling.require_int_string(market_id)
   use market <- require_market(market_id, ctx)
 
-  ui.page(market, uri.to_string(market_entries_uri))
+  ui.page(market, market_entries_uri)
   |> layout.layout
   |> element.to_document_string_builder
   |> wisp.html_response(200)

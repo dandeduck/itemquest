@@ -32,7 +32,7 @@ pub fn page() -> Element(t) {
       html.text("Be one of the first games to join! Enter the waitlist"),
     ]),
     ui.turbo_frame(
-      [],
+      [attribute.id("waitlist_form")],
       [
         html.form(
           [
@@ -52,7 +52,6 @@ pub fn page() -> Element(t) {
           ],
         ),
       ],
-      id: "waitlist_form",
     ),
   ])
 }

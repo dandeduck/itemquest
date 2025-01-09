@@ -1,4 +1,3 @@
-import gleam/io
 import itemquest/modules/market/sql.{
   type SelectMarketEntriesRow, type SelectMarketRow,
 }
@@ -69,8 +68,6 @@ pub fn get_market_entries(
     AscendingSort -> "ASC"
     DescendingSort -> "DESC"
   }
-
-  io.debug(sort_direction <> sort_by)
 
   use _, rows <- errors.try_query(sql.select_market_entries(
     ctx.db,

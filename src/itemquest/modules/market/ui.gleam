@@ -2,6 +2,7 @@ import gleam/float
 import gleam/int
 import gleam/list
 import gleam/option
+import gleam/uri.{type Uri}
 import itemquest/modules/market/sql.{
   type SelectMarketEntriesRow, type SelectMarketRow,
 }
@@ -12,7 +13,7 @@ import lustre/element/html
 
 const market_rows_container_id = "market_rows_container"
 
-pub fn page(market: SelectMarketRow, market_entries_uri: String) -> Element(t) {
+pub fn page(market: SelectMarketRow, market_entries_uri: Uri) -> Element(t) {
   html.section([], [
     html.header([], [
       html.h1([attribute.class("color-black text-3xl mb-20")], [
@@ -28,17 +29,48 @@ pub fn page(market: SelectMarketRow, market_entries_uri: String) -> Element(t) {
             ),
           ],
           [
-            html.th([attribute.class("w-0")], [html.text("Image")]),
-            html.th([], [html.text("Item name")]),
-            html.th([attribute.class("w-0")], [html.text("Quantity")]),
-            html.th([attribute.class("w-0")], [html.text("Popularity")]),
-            html.th([attribute.class("w-10")], [html.text("Price")]),
+            html.th([attribute.class("w-0")], [
+              html.h2([], [html.text("image")]),
+            ]),
+            html.th([], [html.h2([], [html.text("item name")])]),
+            html.th([attribute.class("w-0")], [
+              html.h2([attribute.class("flex items-center")], [
+                html.text("quantity"),
+                html.div([], [
+                  html.a(
+                    [attribute.href("?sort_by=quantity&sort_direction=asc")],
+                    [ui.icon("arrow_drop_down", option.Some("rotate-180"))],
+                  ),
+                  html.a(
+                    [attribute.href("?sort_by=quantity&sort_direction=desc")],
+                    [ui.icon("arrow_drop_down", option.None)],
+                  ),
+                ]),
+              ]),
+            ]),
+            html.th([attribute.class("w-0")], [
+              html.h2([], [html.text("popularity")]),
+            ]),
+            html.th([attribute.class("w-10")], [
+              html.h2([attribute.class("flex items-center")], [
+                html.text("price"),
+                html.div([], [
+                  html.a(
+                    [attribute.href("?sort_by=price&sort_direction=asc")],
+                    [ui.icon("arrow_drop_down", option.Some("rotate-180"))],
+                  ),
+                  html.a(
+                    [attribute.href("?sort_by=price&sort_direction=desc")],
+                    [ui.icon("arrow_drop_down", option.None)],
+                  ),
+                ]),
+              ]),
+            ]),
           ],
         ),
         ui.eager_loading_frame(
           [attribute.attribute("data-turbo-stream", "true")],
-          id: "_",
-          load_from: market_entries_uri,
+          load_from: uri.to_string(market_entries_uri),
         ),
       ]),
     ]),
@@ -47,8 +79,8 @@ pub fn page(market: SelectMarketRow, market_entries_uri: String) -> Element(t) {
 
 pub fn market_rows(entries: List(SelectMarketEntriesRow)) -> Element(t) {
   case entries {
-    [] -> [html.h2([], [html.text("No items, sorry!")])]
     // todo: fix me!
+    [] -> [html.h2([], [html.text("No items, sorry!")])]
     _ -> list.map(entries, market_row)
   }
   |> ui.turbo_stream(ui.StreamAppend, market_rows_container_id, _)

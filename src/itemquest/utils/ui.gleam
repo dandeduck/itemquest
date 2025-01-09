@@ -1,22 +1,21 @@
 import lustre/attribute.{type Attribute}
 import lustre/element.{type Element}
 import lustre/element/html
+import gleam/option.{type Option}
 
 pub fn eager_loading_frame(
   attr: List(Attribute(t)),
-  id id: String,
   load_from src: String,
 ) -> Element(t) {
   // todo: Add spinner inside of the frame
-  turbo_frame([attribute.src(src), ..attr], [], id)
+  turbo_frame([attribute.src(src), ..attr], [])
 }
 
 pub fn turbo_frame(
   attrs: List(Attribute(t)),
   children: List(Element(t)),
-  id id: String,
 ) -> Element(t) {
-  element.element("turbo-frame", [attribute.id(id), ..attrs], children)
+  element.element("turbo-frame", attrs, children)
 }
 
 pub type TurboStreamAction {
@@ -54,4 +53,10 @@ pub fn turbo_stream(
 
 pub fn turbo_stream_source() -> Element(t) {
   element.element("turbo-stream-source", [], [])
+}
+
+pub fn icon(name: String, class: Option(String)) -> Element(t) {
+  html.span([attribute.class("material-symbols-outlined " <> option.unwrap(class, ""))], [
+    html.text(name),
+  ])
 }
