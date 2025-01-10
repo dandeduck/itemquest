@@ -72,14 +72,6 @@ pub fn handle_get_market_entries(
   use limit <- handling.require_int_string(limit)
   use offset <- handling.require_int_string(offset)
 
-  io.debug(internal.MarketEntriesSearch(
-    market_id:,
-    sort_by:,
-    sort_direction:,
-    limit:,
-    offset:,
-  ))
-
   case
     internal.get_market_entries(
       internal.MarketEntriesSearch(

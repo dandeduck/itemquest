@@ -15,6 +15,36 @@ const market_rows_container_id = "market_rows_container"
 
 pub fn page(market: SelectMarketRow, market_entries_uri: Uri) -> Element(t) {
   html.section([], [
+    html.script([attribute.type_("module")], "
+        const limit = 25
+        let offset = 0
+        let fetching = false
+
+        window.addEventListener('scroll', () => {
+            const entriesUrl = new URL(window.location.href)
+            entriesUrl.pathname += '/entries'
+
+            window.requestAnimationFrame(() => {
+                if (!fetching && window.scrollY + window.innerHeight >= document.body.offsetHeight - 500) {
+                    fetching = true
+                    offset += limit
+                    entriesUrl.searchParams.set('offset', offset)
+                    fetchStream(entriesUrl.toString()).then(() => fetching = false)
+                }
+            }, 0)
+        })
+
+        async function fetchStream(url) {
+            const response = await fetch(url, {
+                method: 'get', 
+                headers: {
+                    'Accept': 'text/vnd.turbo-stream.html',
+                }
+            })
+            const html = await response.text();
+            Turbo.renderStreamMessage(html)
+        }
+    "),
     html.header([], [
       html.h1([attribute.class("color-black text-3xl mb-20")], [
         html.text(market.name),
