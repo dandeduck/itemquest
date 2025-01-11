@@ -1,3 +1,7 @@
+import gleam/bool
+import gleam/io
+import gleam/result
+import gleam/string
 import itemquest/modules/market/sql.{
   type SelectMarketEntriesRow, type SelectMarketRow,
 }
@@ -30,16 +34,19 @@ pub fn select_market(
 
 pub const sort_by_touples = [
   #("price", SortByPrice), #("quantity", SortByQuantity),
+  #("popularity", SortByPopularity),
 ]
 
 pub type MarketEntriesSortBy {
   SortByPrice
   SortByQuantity
+  SortByPopularity
 }
 
-pub type MarketEntriesSearch {
-  MarketEntriesSearch(
+pub type MarketEntriesFilter {
+  MarketEntriesFilter(
     market_id: Int,
+    search: Result(String, Nil),
     sort_by: MarketEntriesSortBy,
     sort_direction: SortDirection,
     limit: Int,
@@ -56,27 +63,71 @@ pub type SortDirection {
   DescendingSort
 }
 
-pub fn get_market_entries(
-  search: MarketEntriesSearch,
-  ctx: RequestContext,
-) -> Result(List(SelectMarketEntriesRow), InternalError(t)) {
-  let sort_by = case search.sort_by {
+pub fn get_market_query(
+  sort_by: MarketEntriesSortBy,
+  sort_direction: SortDirection,
+  search: Result(String, Nil),
+) -> String {
+  let sort_by = case sort_by {
     SortByPrice -> "price"
     SortByQuantity -> "quantity"
+    SortByPopularity -> "popularity"
   }
-  let sort_direction = case search.sort_direction {
+  let sort_direction = case sort_direction {
+    AscendingSort -> "asc"
+    DescendingSort -> "desc"
+  }
+  let query = "?sort_by=" <> sort_by <> "&sort_direction=" <> sort_direction
+
+  handle_search(search, fn(search) { query <> "&search=" <> search }, fn() {
+    query
+  })
+}
+
+pub fn get_market_entries(
+  filter: MarketEntriesFilter,
+  ctx: RequestContext,
+) -> Result(List(SelectMarketEntriesRow), InternalError(t)) {
+  let sort_by = case filter.sort_by {
+    SortByPrice -> "price"
+    SortByQuantity -> "quantity"
+    SortByPopularity -> "popularity"
+  }
+  let sort_direction = case filter.sort_direction {
     AscendingSort -> "ASC"
     DescendingSort -> "DESC"
   }
+  let search =
+    handle_search(
+      filter.search,
+      // todo: check if we need to replace " " with <-> instead
+      fn(search) { string.replace(search, each: " ", with: "+") <> ":*" },
+      fn() { "" },
+    )
 
   use _, rows <- errors.try_query(sql.select_market_entries(
     ctx.db,
-    search.market_id,
+    filter.market_id,
+    search,
     sort_by,
     sort_direction,
-    search.limit,
-    search.offset,
+    filter.limit,
+    filter.offset,
   ))
 
   Ok(rows)
+}
+
+fn handle_search(
+  search: Result(String, Nil),
+  on_set: fn(String) -> t,
+  on_empty: fn() -> t,
+) -> t {
+  case result.unwrap(search, "") != "" {
+    True -> {
+      let assert Ok(search) = search
+      on_set(search)
+    }
+    _ -> on_empty()
+  }
 }

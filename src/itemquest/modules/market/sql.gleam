@@ -29,50 +29,52 @@ VALUES ($1);
 ///
 pub type SelectMarketEntriesRow {
   SelectMarketEntriesRow(
-    item_id: Int,
-    quantity: Int,
-    price: Option(Int),
     name: String,
-    image_url: Option(String),
+    image_url: String,
+    quantity: Int,
+    popularity: Int,
+    price: Option(Int),
   )
 }
 
-/// Select market entries with (market_id, sort_by, sort_direction, limit, offset)
+/// Select market entries with (market_id, search, sort_by, sort_direction, limit, offset)
 ///
 /// > 🐿️ This function was generated automatically using v2.0.5 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
-pub fn select_market_entries(db, arg_1, arg_2, arg_3, arg_4, arg_5) {
+pub fn select_market_entries(db, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6) {
   let decoder = {
-    use item_id <- zero.field(0, zero.int)
-    use quantity <- zero.field(1, zero.int)
-    use price <- zero.field(2, zero.optional(zero.int))
-    use name <- zero.field(3, zero.string)
-    use image_url <- zero.field(4, zero.optional(zero.string))
+    use name <- zero.field(0, zero.string)
+    use image_url <- zero.field(1, zero.string)
+    use quantity <- zero.field(2, zero.int)
+    use popularity <- zero.field(3, zero.int)
+    use price <- zero.field(4, zero.optional(zero.int))
     zero.success(
-      SelectMarketEntriesRow(item_id:, quantity:, price:, name:, image_url:),
+      SelectMarketEntriesRow(name:, image_url:, quantity:, popularity:, price:),
     )
   }
 
-  let query = "-- Select market entries with (market_id, sort_by, sort_direction, limit, offset)
-SELECT market_entries.*, items.name, items.image_url
-FROM items 
-INNER JOIN market_entries ON items.item_id=market_entries.item_id
-WHERE items.market_id = $1
+  let query = "-- Select market entries with (market_id, search, sort_by, sort_direction, limit, offset)
+SELECT name, image_url, quantity, popularity, price
+FROM market_entries 
+WHERE market_id = $1 AND CASE WHEN $2 != '' THEN name_search @@ to_tsquery($2) ELSE TRUE END
 ORDER BY 
-    (CASE WHEN $3 = 'ASC' AND $2 = 'price' THEN market_entries.price END) ASC NULLS FIRST,
-    (CASE WHEN $3 = 'DESC' AND $2 = 'price' THEN market_entries.price END) DESC NULLS LAST,
-    (CASE WHEN $3 = 'ASC' AND $2 = 'quantity' THEN market_entries.quantity END) ASC,
-    (CASE WHEN $3 = 'DESC' AND $2 = 'quantity' THEN market_entries.quantity END) DESC
-LIMIT $4 OFFSET $5;
+    (CASE WHEN $4 = 'ASC' AND $3 = 'popularity' THEN popularity END) ASC,
+    (CASE WHEN $4 = 'DESC' AND $3 = 'popularity' THEN popularity END) DESC,
+    (CASE WHEN $4 = 'ASC' AND $3 = 'price' THEN price END) ASC NULLS FIRST,
+    (CASE WHEN $4 = 'DESC' AND $3 = 'price' THEN price END) DESC NULLS LAST,
+    (CASE WHEN $4 = 'ASC' AND $3 = 'quantity' THEN quantity END) ASC,
+    (CASE WHEN $4 = 'DESC' AND $3 = 'quantity' THEN quantity END) DESC
+LIMIT $5 OFFSET $6;
 "
 
   pog.query(query)
   |> pog.parameter(pog.int(arg_1))
   |> pog.parameter(pog.text(arg_2))
   |> pog.parameter(pog.text(arg_3))
-  |> pog.parameter(pog.int(arg_4))
+  |> pog.parameter(pog.text(arg_4))
   |> pog.parameter(pog.int(arg_5))
+  |> pog.parameter(pog.int(arg_6))
   |> pog.returning(zero.run(_, decoder))
   |> pog.execute(db)
 }

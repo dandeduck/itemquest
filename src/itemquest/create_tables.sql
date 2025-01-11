@@ -35,9 +35,14 @@ CREATE TABLE item_instances (
 );
 
 CREATE TABLE market_entries (
-    item_id   serial PRIMARY KEY REFERENCES items, 
-    quantity  integer NOT NULL DEFAULT 0 CHECK (quantity >= 0),
-    price     integer CHECK (price > 0)
+    item_id     serial PRIMARY KEY REFERENCES items, 
+    market_id   serial REFERENCES markets,
+    name        varchar(31) NOT NULL,
+    image_url   varchar(255) NOT NULL,
+    popularity  integer NOT NULL DEFAULT 0 CHECK (popularity >= 0),
+    quantity    integer NOT NULL DEFAULT 0 CHECK (quantity >= 0),
+    price       integer CHECK (price > 0),
+    name_search tsvector generated always as (to_tsvector('english', name)) stored
 );
 
 CREATE TABLE waitlist_emails (

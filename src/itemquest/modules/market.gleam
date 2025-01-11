@@ -1,5 +1,5 @@
 import gleam/http
-import gleam/io
+import gleam/list
 import gleam/option
 import gleam/uri
 import itemquest/modules/market/internal
@@ -18,6 +18,12 @@ pub fn handle_get_market_by_id(
 ) -> Response {
   use <- wisp.require_method(req, http.Get)
 
+  let query = wisp.get_query(req)
+  let search = list.key_find(query, "search")
+  let sort_by = handling.optional_list_key(query, "sort_by", "quantity")
+  let sort_direction =
+    handling.optional_list_key(query, "sort_direction", "desc")
+
   let market_entries_uri =
     uri.Uri(
       option.None,
@@ -30,9 +36,15 @@ pub fn handle_get_market_by_id(
     )
 
   use market_id <- handling.require_int_string(market_id)
+  use sort_by <- handling.require_list_key(internal.sort_by_touples, sort_by)
+  use sort_direction <- handling.require_list_key(
+    internal.sort_direction_touples,
+    sort_direction,
+  )
+
   use market <- require_market(market_id, ctx)
 
-  ui.page(market, market_entries_uri)
+  ui.page(market, market_entries_uri, sort_by, sort_direction, search)
   |> layout.layout
   |> element.to_document_string_builder
   |> wisp.html_response(200)
@@ -57,6 +69,7 @@ pub fn handle_get_market_entries(
 ) -> Response {
   use <- wisp.require_method(req, http.Get)
   let query = wisp.get_query(req)
+  let search = list.key_find(query, "search")
   let sort_by = handling.optional_list_key(query, "sort_by", "quantity")
   let sort_direction =
     handling.optional_list_key(query, "sort_direction", "desc")
@@ -74,8 +87,9 @@ pub fn handle_get_market_entries(
 
   case
     internal.get_market_entries(
-      internal.MarketEntriesSearch(
+      internal.MarketEntriesFilter(
         market_id:,
+        search:,
         sort_by:,
         sort_direction:,
         limit:,
@@ -85,9 +99,17 @@ pub fn handle_get_market_entries(
     )
   {
     Ok(entries) ->
-      ui.market_rows(entries)
-      |> element.to_document_string_builder
-      |> handling.turbo_stream_html_response(200)
+      case entries {
+        [] ->
+          ui.market_rows(entries)
+          |> element.to_document_string_builder
+          |> wisp.html_response(200)
+
+        _ ->
+          ui.market_rows(entries)
+          |> element.to_document_string_builder
+          |> handling.turbo_stream_html_response(200)
+      }
     // todo: show error instead
     Error(_) -> wisp.internal_server_error()
   }
