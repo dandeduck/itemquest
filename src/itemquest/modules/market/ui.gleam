@@ -119,13 +119,9 @@ pub fn page(
 }
 
 pub fn market_rows(entries: List(SelectMarketEntriesRow)) -> Element(t) {
-  case entries {
-    // todo: fix me!
-    [] -> html.h2([], [html.text("No items, sorry!")])
-    _ ->
-      list.map(entries, market_row)
-      |> ui.turbo_stream(ui.StreamAppend, market_rows_container_id, _)
-  }
+  entries
+  |> list.map(market_row)
+  |> ui.turbo_stream(ui.StreamAppend, market_rows_container_id, _)
 }
 
 fn market_row(entry: SelectMarketEntriesRow) -> Element(t) {
