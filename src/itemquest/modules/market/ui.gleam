@@ -53,6 +53,9 @@ pub fn page(
                     'Accept': 'text/vnd.turbo-stream.html',
                 }
             })
+            if (response.status !== 200) {
+                return
+            }
             const html = await response.text();
             Turbo.renderStreamMessage(html)
         }

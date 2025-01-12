@@ -100,11 +100,7 @@ pub fn handle_get_market_entries(
   {
     Ok(entries) ->
       case entries {
-        [] ->
-          ui.market_rows(entries)
-          |> element.to_document_string_builder
-          |> wisp.html_response(200)
-
+        [] -> wisp.no_content()
         _ ->
           ui.market_rows(entries)
           |> element.to_document_string_builder
