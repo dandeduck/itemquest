@@ -20,8 +20,8 @@ const market_rows_container_id = "market_rows_container"
 pub fn page(
   market: SelectMarketRow,
   market_entries_uri: Uri,
-  _sort_by: MarketEntriesSortBy,
-  _sort_direction: SortDirection,
+  sort_by: MarketEntriesSortBy,
+  sort_direction: SortDirection,
   search: Result(String, Nil),
 ) -> Element(t) {
   html.section([], [
@@ -32,16 +32,20 @@ pub fn page(
         let offset = 0
         let fetching = false
 
-        window.addEventListener('scroll', () => {
+        const listener = window.addEventListener('scroll', () => {
             const entriesUrl = new URL(window.location.href)
             entriesUrl.pathname += '/entries'
 
-            window.requestAnimationFrame(() => {
+            window.requestAnimationFrame(async () => {
                 if (!fetching && window.scrollY + window.innerHeight >= document.body.offsetHeight - 500) {
                     fetching = true
                     offset += limit
                     entriesUrl.searchParams.set('offset', offset)
-                    fetchStream(entriesUrl.toString()).then(() => fetching = false)
+
+                    const success = await fetchStream(entriesUrl.toString())
+                    if (success) {
+                        fetching = false
+                    }
                 }
             }, 0)
         })
@@ -53,11 +57,14 @@ pub fn page(
                     'Accept': 'text/vnd.turbo-stream.html',
                 }
             })
+
             if (response.status !== 200) {
-                return
+                return false
             }
+
             const html = await response.text();
             Turbo.renderStreamMessage(html)
+            return true
         }
     ",
     ),
@@ -68,8 +75,21 @@ pub fn page(
       html.search([], [
         html.form([], [
           html.input([
+            attribute.type_("hidden"),
+            attribute.name("sort_by"),
+            sort_by |> internal.sort_by_to_string |> attribute.value,
+          ]),
+          html.input([
+            attribute.name("sort_direction"),
+            attribute.type_("hidden"),
+            sort_direction
+              |> internal.sort_direction_to_string
+              |> attribute.value,
+          ]),
+          html.input([
             attribute.name("search"),
             attribute.placeholder("search"),
+            attribute.type_("text"),
             attribute.value(result.unwrap(search, "")),
             attribute.class("w-full"),
           ]),

@@ -1,7 +1,8 @@
-import gleam/bool
 import gleam/io
+import gleam/list
 import gleam/result
 import gleam/string
+import gleam/uri
 import itemquest/modules/market/sql.{
   type SelectMarketEntriesRow, type SelectMarketRow,
 }
@@ -43,6 +44,14 @@ pub type MarketEntriesSortBy {
   SortByPopularity
 }
 
+pub fn sort_by_to_string(sort_by: MarketEntriesSortBy) -> String {
+  case sort_by {
+    SortByPrice -> "price"
+    SortByQuantity -> "quantity"
+    SortByPopularity -> "popularity"
+  }
+}
+
 pub type MarketEntriesFilter {
   MarketEntriesFilter(
     market_id: Int,
@@ -63,40 +72,35 @@ pub type SortDirection {
   DescendingSort
 }
 
+pub fn sort_direction_to_string(sort_direction: SortDirection) -> String {
+  case sort_direction {
+    AscendingSort -> "asc"
+    DescendingSort -> "desc"
+  }
+}
+
 pub fn get_market_query(
   sort_by: MarketEntriesSortBy,
   sort_direction: SortDirection,
   search: Result(String, Nil),
 ) -> String {
-  let sort_by = case sort_by {
-    SortByPrice -> "price"
-    SortByQuantity -> "quantity"
-    SortByPopularity -> "popularity"
-  }
-  let sort_direction = case sort_direction {
-    AscendingSort -> "asc"
-    DescendingSort -> "desc"
-  }
-  let query = "?sort_by=" <> sort_by <> "&sort_direction=" <> sort_direction
+  let query = [
+    #("sort_by", sort_by_to_string(sort_by)),
+    #("sort_direction", sort_direction_to_string(sort_direction)),
+  ]
 
-  handle_search(search, fn(search) { query <> "&search=" <> search }, fn() {
-    query
-  })
+  let search_addition =
+    handle_search(search, fn(search) { [#("search", search)] }, list.new)
+
+  "?"
+  <> list.flatten([query, search_addition])
+  |> uri.query_to_string
 }
 
 pub fn get_market_entries(
   filter: MarketEntriesFilter,
   ctx: RequestContext,
 ) -> Result(List(SelectMarketEntriesRow), InternalError(t)) {
-  let sort_by = case filter.sort_by {
-    SortByPrice -> "price"
-    SortByQuantity -> "quantity"
-    SortByPopularity -> "popularity"
-  }
-  let sort_direction = case filter.sort_direction {
-    AscendingSort -> "ASC"
-    DescendingSort -> "DESC"
-  }
   let search =
     handle_search(
       filter.search,
@@ -105,12 +109,20 @@ pub fn get_market_entries(
       fn() { "" },
     )
 
+  io.debug(search)
+  io.debug(filter.sort_by |> sort_by_to_string)
+  io.debug(
+    filter.sort_direction |> sort_direction_to_string |> string.uppercase,
+  )
+  io.debug(filter.limit)
+  io.debug(filter.offset)
+
   use _, rows <- errors.try_query(sql.select_market_entries(
     ctx.db,
     filter.market_id,
     search,
-    sort_by,
-    sort_direction,
+    filter.sort_by |> sort_by_to_string,
+    filter.sort_direction |> sort_direction_to_string |> string.uppercase,
     filter.limit,
     filter.offset,
   ))
