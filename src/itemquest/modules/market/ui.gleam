@@ -121,7 +121,7 @@ pub fn page(
                 header_sorting(internal.SortByPopularity, search),
               ]),
             ]),
-            html.th([attribute.class("w-10")], [
+            html.th([attribute.class("w-20")], [
               html.h2([attribute.class("flex items-center")], [
                 html.text("price"),
                 header_sorting(internal.SortByPrice, search),

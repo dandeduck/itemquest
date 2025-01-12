@@ -1,4 +1,3 @@
-import gleam/io
 import gleam/list
 import gleam/result
 import gleam/string
@@ -108,14 +107,6 @@ pub fn get_market_entries(
       fn(search) { string.replace(search, each: " ", with: "+") <> ":*" },
       fn() { "" },
     )
-
-  io.debug(search)
-  io.debug(filter.sort_by |> sort_by_to_string)
-  io.debug(
-    filter.sort_direction |> sort_direction_to_string |> string.uppercase,
-  )
-  io.debug(filter.limit)
-  io.debug(filter.offset)
 
   use _, rows <- errors.try_query(sql.select_market_entries(
     ctx.db,
