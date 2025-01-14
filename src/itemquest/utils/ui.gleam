@@ -56,7 +56,7 @@ pub fn turbo_stream_source() -> Element(t) {
 }
 
 pub fn icon(name: String, class: Option(String)) -> Element(t) {
-  html.span([attribute.class("material-symbols-outlined " <> option.unwrap(class, ""))], [
+  html.span([attribute.class("material-symbols-outlined flex items-center justify-center " <> option.unwrap(class, ""))], [
     html.text(name),
   ])
 }

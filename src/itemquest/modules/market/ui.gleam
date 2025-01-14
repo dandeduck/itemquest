@@ -1,7 +1,7 @@
 import gleam/float
 import gleam/int
 import gleam/list
-import gleam/option
+import gleam/option.{type Option}
 import gleam/result
 import gleam/uri.{type Uri}
 import itemquest/modules/market/internal.{
@@ -110,21 +110,30 @@ pub fn page(
             ]),
             html.th([], [html.h2([], [html.text("item name")])]),
             html.th([attribute.class("w-0")], [
-              html.h2([attribute.class("flex items-center")], [
+              html.h2([attribute.class("flex items-center gap-1")], [
                 html.text("quantity"),
-                header_sorting(internal.SortByQuantity, search),
+                header_sorting(internal.SortByQuantity, search, case sort_by {
+                  internal.SortByQuantity -> option.Some(sort_direction)
+                  _ -> option.None
+                }),
               ]),
             ]),
             html.th([attribute.class("w-0")], [
-              html.h2([attribute.class("flex items-center")], [
+              html.h2([attribute.class("flex items-center gap-1")], [
                 html.text("popularity"),
-                header_sorting(internal.SortByPopularity, search),
+                header_sorting(internal.SortByPopularity, search, case sort_by {
+                  internal.SortByPopularity -> option.Some(sort_direction)
+                  _ -> option.None
+                }),
               ]),
             ]),
             html.th([attribute.class("w-20")], [
-              html.h2([attribute.class("flex items-center")], [
+              html.h2([attribute.class("flex items-center gap-1")], [
                 html.text("price"),
-                header_sorting(internal.SortByPrice, search),
+                header_sorting(internal.SortByPrice, search, case sort_by {
+                  internal.SortByPrice -> option.Some(sort_direction)
+                  _ -> option.None
+                }),
               ]),
             ]),
           ],
@@ -171,8 +180,9 @@ fn market_row(entry: SelectMarketEntriesRow) -> Element(t) {
 fn header_sorting(
   sort_by: MarketEntriesSortBy,
   search: Result(String, Nil),
+  selected_direction: Option(SortDirection),
 ) -> Element(a) {
-  html.div([], [
+  html.div([attribute.class("space-y-1 ")], [
     html.a(
       [
         attribute.href(internal.get_market_query(
@@ -181,7 +191,18 @@ fn header_sorting(
           search,
         )),
       ],
-      [ui.icon("arrow_drop_down", option.Some("rotate-180"))],
+      [
+        ui.icon(
+          "arrow_drop_down",
+          option.Some(
+            "rotate-180 w-4 h-4 "
+            <> case selected_direction {
+              option.Some(internal.AscendingSort) -> "opacity-100"
+              _ -> "opacity-50"
+            },
+          ),
+        ),
+      ],
     ),
     html.a(
       [
@@ -191,7 +212,18 @@ fn header_sorting(
           search,
         )),
       ],
-      [ui.icon("arrow_drop_down", option.None)],
+      [
+        ui.icon(
+          "arrow_drop_down",
+          option.Some(
+            "w-4 h-4 "
+            <> case selected_direction {
+              option.Some(internal.DescendingSort) -> "opacity-100"
+              _ -> "opacity-50"
+            },
+          ),
+        ),
+      ],
     ),
   ])
 }
