@@ -99,7 +99,7 @@ pub fn get_market_query(
 pub fn get_market_entries(
   filter: MarketEntriesFilter,
   ctx: RequestContext,
-) -> Result(List(SelectMarketEntriesRow), InternalError(t)) {
+) -> Result(List(SelectMarketEntriesRow), InternalError(Nil)) {
   let search =
     handle_search(
       filter.search,
@@ -133,4 +133,20 @@ fn handle_search(
     }
     _ -> on_empty()
   }
+}
+
+pub fn search_market_entry_names(
+  market_id: Int,
+  search: String,
+  ctx: RequestContext,
+) -> Result(List(String), InternalError(Nil)) {
+  use _, rows <- errors.try_query(sql.select_market_entry_names(
+    ctx.db,
+    market_id,
+    search,
+  ))
+
+  rows
+  |> list.map(fn(row) { row.name })
+  |> Ok
 }

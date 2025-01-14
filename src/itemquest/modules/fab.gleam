@@ -6,7 +6,7 @@ pub fn create_item(
   ctx: RequestContext,
   market_id: Int,
   name: String,
-) -> Result(Int, InternalError(t)) {
+) -> Result(Int, InternalError(Nil)) {
   use _, rows <- errors.try_query(sql.insert_item(ctx.db, market_id, name))
   let assert [row] = rows
 

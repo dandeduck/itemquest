@@ -21,6 +21,44 @@ VALUES ($1);
   |> pog.execute(db)
 }
 
+/// A row you get from running the `select_market_entry_names` query
+/// defined in `./src/itemquest/modules/market/sql/select_market_entry_names.sql`.
+///
+/// > 🐿️ This type definition was generated automatically using v2.0.5 of the
+/// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub type SelectMarketEntryNamesRow {
+  SelectMarketEntryNamesRow(name: String, rank: Float)
+}
+
+/// Select market entry names with (name)
+///
+/// > 🐿️ This function was generated automatically using v2.0.5 of
+/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub fn select_market_entry_names(db, arg_1, arg_2) {
+  let decoder = {
+    use name <- zero.field(0, zero.string)
+    use rank <- zero.field(1, zero.float)
+    zero.success(SelectMarketEntryNamesRow(name:, rank:))
+  }
+
+  let query = "
+-- Select market entry names with (name)
+SELECT name, ts_rank(name_search, to_tsquery($2)) as rank
+FROM market_entries 
+WHERE market_id = $1 AND name_search @@ to_tsquery($2)
+ORDER BY rank DESC
+LIMIT 10;
+"
+
+  pog.query(query)
+  |> pog.parameter(pog.int(arg_1))
+  |> pog.parameter(pog.text(arg_2))
+  |> pog.returning(zero.run(_, decoder))
+  |> pog.execute(db)
+}
+
 /// A row you get from running the `select_market_entries` query
 /// defined in `./src/itemquest/modules/market/sql/select_market_entries.sql`.
 ///

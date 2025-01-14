@@ -4,12 +4,24 @@ import gleam/list
 import gleam/string_tree.{type StringTree}
 import wisp.{type FormData, type Response}
 
+// todo: return 400 with some content... maybe?
+
 pub fn require_form_key(
   form: FormData,
   name: String,
   handle_request: fn(String) -> Response,
 ) -> Response {
   require_list_key(form.values, name, handle_request)
+}
+
+pub fn require_ok_result(
+  result: Result(t, Nil),
+  handle_request: fn(t) -> Response,
+) -> Response {
+  case result {
+      Ok(value) -> handle_request(value)
+      _ -> wisp.bad_request()
+  }
 }
 
 pub fn optional_list_key(

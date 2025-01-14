@@ -17,6 +17,8 @@ import lustre/element/html
 
 const market_rows_container_id = "market_rows_container"
 
+const search_results_container_id = "search_results_container"
+
 pub fn page(
   market: SelectMarketRow,
   market_entries_uri: Uri,
@@ -25,76 +27,12 @@ pub fn page(
   search: Result(String, Nil),
 ) -> Element(t) {
   html.section([], [
-    html.script(
-      [attribute.type_("module")],
-      "
-        const limit = 25
-        let offset = 0
-        let fetching = false
-
-        const listener = window.addEventListener('scroll', () => {
-            const entriesUrl = new URL(window.location.href)
-            entriesUrl.pathname += '/entries'
-
-            window.requestAnimationFrame(async () => {
-                if (!fetching && window.scrollY + window.innerHeight >= document.body.offsetHeight - 500) {
-                    fetching = true
-                    offset += limit
-                    entriesUrl.searchParams.set('offset', offset)
-
-                    const success = await fetchStream(entriesUrl.toString())
-                    if (success) {
-                        fetching = false
-                    }
-                }
-            }, 0)
-        })
-
-        async function fetchStream(url) {
-            const response = await fetch(url, {
-                method: 'get', 
-                headers: {
-                    'Accept': 'text/vnd.turbo-stream.html',
-                }
-            })
-
-            if (response.status !== 200) {
-                return false
-            }
-
-            const html = await response.text();
-            Turbo.renderStreamMessage(html)
-            return true
-        }
-    ",
-    ),
+    on_load_script(),
     html.header([attribute.class("mb-20")], [
       html.h1([attribute.class("color-black text-3xl mb-10")], [
         html.text(market.name),
       ]),
-      html.search([], [
-        html.form([], [
-          html.input([
-            attribute.type_("hidden"),
-            attribute.name("sort_by"),
-            sort_by |> internal.sort_by_to_string |> attribute.value,
-          ]),
-          html.input([
-            attribute.name("sort_direction"),
-            attribute.type_("hidden"),
-            sort_direction
-              |> internal.sort_direction_to_string
-              |> attribute.value,
-          ]),
-          html.input([
-            attribute.name("search"),
-            attribute.placeholder("search"),
-            attribute.type_("text"),
-            attribute.value(result.unwrap(search, "")),
-            attribute.class("w-full"),
-          ]),
-        ]),
-      ]),
+      search_bar(sort_by, sort_direction, search),
     ]),
     html.table([attribute.class("w-full")], [
       html.tbody([attribute.id(market_rows_container_id)], [
@@ -110,31 +48,28 @@ pub fn page(
             ]),
             html.th([], [html.h2([], [html.text("item name")])]),
             html.th([attribute.class("w-0")], [
-              html.h2([attribute.class("flex items-center gap-1")], [
-                html.text("quantity"),
-                header_sorting(internal.SortByQuantity, search, case sort_by {
-                  internal.SortByQuantity -> option.Some(sort_direction)
-                  _ -> option.None
-                }),
-              ]),
+              sorting_header(
+                internal.SortByQuantity,
+                sort_by,
+                sort_direction,
+                search,
+              ),
             ]),
             html.th([attribute.class("w-0")], [
-              html.h2([attribute.class("flex items-center gap-1")], [
-                html.text("popularity"),
-                header_sorting(internal.SortByPopularity, search, case sort_by {
-                  internal.SortByPopularity -> option.Some(sort_direction)
-                  _ -> option.None
-                }),
-              ]),
+              sorting_header(
+                internal.SortByPopularity,
+                sort_by,
+                sort_direction,
+                search,
+              ),
             ]),
             html.th([attribute.class("w-20")], [
-              html.h2([attribute.class("flex items-center gap-1")], [
-                html.text("price"),
-                header_sorting(internal.SortByPrice, search, case sort_by {
-                  internal.SortByPrice -> option.Some(sort_direction)
-                  _ -> option.None
-                }),
-              ]),
+              sorting_header(
+                internal.SortByPrice,
+                sort_by,
+                sort_direction,
+                search,
+              ),
             ]),
           ],
         ),
@@ -145,6 +80,18 @@ pub fn page(
       ]),
     ]),
   ])
+}
+
+pub fn search_results(names: List(String)) -> Element(t) {
+  names
+  |> list.map(search_result)
+  |> html.div([attribute.id(search_results_container_id)], _)
+  |> list.wrap
+  |> ui.turbo_stream(ui.StreamReplace, search_results_container_id, _)
+}
+
+fn search_result(name: String) -> Element(t) {
+  html.div([], [html.text(name)])
 }
 
 pub fn market_rows(entries: List(SelectMarketEntriesRow)) -> Element(t) {
@@ -177,12 +124,114 @@ fn market_row(entry: SelectMarketEntriesRow) -> Element(t) {
   )
 }
 
+// todo: move to a .js file or compile gleam in the future
+fn on_load_script() -> Element(a) {
+  html.script(
+    [attribute.type_("module")],
+    "
+        const limit = 25
+        let offset = 0
+        let fetching = false
+
+        window.addEventListener('scroll', () => {
+            const entriesUrl = new URL(window.location.href)
+            entriesUrl.pathname += '/entries'
+
+            window.requestAnimationFrame(async () => {
+                if (!fetching && window.scrollY + window.innerHeight >= document.body.offsetHeight - 500) {
+                    fetching = true
+                    offset += limit
+                    entriesUrl.searchParams.set('offset', offset)
+
+                    const success = await fetchStream(entriesUrl.toString())
+                    if (success) {
+                        fetching = false
+                    }
+                }
+            }, 0)
+        })
+
+        document.getElementById('search_input').addEventListener('keypress', event => {
+            const searchUrl = new URL(window.location.href)
+            searchUrl.pathname += '/entries/search'
+            searchUrl.search = ''
+            searchUrl.searchParams.append('search', event.target.value)
+            fetchStream(searchUrl.toString())
+        })
+
+        async function fetchStream(url) {
+            const response = await fetch(url, {
+                method: 'get', 
+                headers: {
+                    'Accept': 'text/vnd.turbo-stream.html',
+                }
+            })
+
+            if (response.status !== 200) {
+                return false
+            }
+
+            const html = await response.text();
+            Turbo.renderStreamMessage(html)
+            return true
+        }
+    ",
+  )
+}
+
+fn search_bar(
+  sort_by: MarketEntriesSortBy,
+  sort_direction: SortDirection,
+  search: Result(String, Nil),
+) -> Element(a) {
+  html.search([], [
+    html.form([], [
+      html.input([
+        attribute.type_("hidden"),
+        attribute.name("sort_by"),
+        sort_by |> internal.sort_by_to_string |> attribute.value,
+      ]),
+      html.input([
+        attribute.type_("hidden"),
+        attribute.name("sort_direction"),
+        sort_direction
+          |> internal.sort_direction_to_string
+          |> attribute.value,
+      ]),
+      html.input([
+        attribute.id("search_input"),
+        attribute.name("search"),
+        attribute.placeholder("search"),
+        attribute.type_("text"),
+        attribute.value(result.unwrap(search, "")),
+        attribute.class("w-full"),
+      ]),
+    ]),
+    html.div([attribute.id(search_results_container_id)], []),
+  ])
+}
+
+fn sorting_header(
+  sort_by: MarketEntriesSortBy,
+  selected_sort_by: MarketEntriesSortBy,
+  selected_sort_direction: SortDirection,
+  search: Result(String, Nil),
+) -> Element(a) {
+  html.h2([attribute.class("flex items-center gap-1")], [
+    html.text(internal.sort_by_to_string(sort_by)),
+    header_sorting(sort_by, search, case sort_by == selected_sort_by {
+      True -> option.Some(selected_sort_direction)
+      _ -> option.None
+    }),
+  ])
+}
+
 fn header_sorting(
   sort_by: MarketEntriesSortBy,
   search: Result(String, Nil),
   selected_direction: Option(SortDirection),
 ) -> Element(a) {
-  html.div([attribute.class("space-y-1 ")], [
+  html.div([attribute.class("space-y-1")], [
     html.a(
       [
         attribute.href(internal.get_market_query(

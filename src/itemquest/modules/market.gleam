@@ -110,3 +110,25 @@ pub fn handle_get_market_entries(
     Error(_) -> wisp.internal_server_error()
   }
 }
+
+pub fn handle_get_market_entries_search(
+  market_id: String,
+  req: Request,
+  ctx: RequestContext,
+) -> Response {
+  use <- wisp.require_method(req, http.Get)
+  let query = wisp.get_query(req)
+  let search = list.key_find(query, "search")
+
+  use market_id <- handling.require_int_string(market_id)
+  use search <- handling.require_ok_result(search)
+
+  case internal.search_market_entry_names(market_id, search, ctx) {
+    Ok(names) ->
+      ui.search_results(names)
+      |> element.to_document_string_builder
+      |> handling.turbo_stream_html_response(200)
+    // todo: show somethin' bro
+    Error(_) -> wisp.internal_server_error()
+  }
+}
