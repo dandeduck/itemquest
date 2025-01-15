@@ -5,7 +5,7 @@ import gleam/option
 import gleam/uri
 import itemquest/modules/market/internal
 import itemquest/modules/market/sql.{type SelectMarketRow}
-import itemquest/modules/market/ui
+import itemquest/modules/market/ui/market_page
 import itemquest/utils/handling
 import itemquest/utils/ui/layout
 import itemquest/web/contexts.{type RequestContext}
@@ -45,7 +45,7 @@ pub fn handle_get_market_by_id(
 
   use market <- require_market(market_id, ctx)
 
-  ui.page(market, market_entries_uri, sort_by, sort_direction, search)
+  market_page.page(market, market_entries_uri, sort_by, sort_direction, search)
   |> layout.layout
   |> element.to_document_string_builder
   |> wisp.html_response(200)
@@ -103,7 +103,7 @@ pub fn handle_get_market_entries(
       case entries {
         [] -> wisp.no_content()
         _ ->
-          ui.market_rows(entries)
+          market_page.market_rows_stream(entries)
           |> element.to_document_string_builder
           |> handling.turbo_stream_html_response(200)
       }
@@ -132,7 +132,7 @@ pub fn handle_get_market_entries_search(
   case names {
     Ok(names) -> {
       io.debug(names)
-      ui.search_results(names)
+      market_page.search_results_stream(names)
       |> element.to_document_string_builder
       |> handling.turbo_stream_html_response(200)
     }
