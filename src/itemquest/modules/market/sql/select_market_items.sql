@@ -1,6 +1,6 @@
--- Select market entries with (market_id, search, sort_by, sort_direction, limit, offset)
+-- Select market items with (market_id, search, sort_by, sort_direction, limit, offset)
 SELECT name, image_url, quantity, popularity, price
-FROM market_entries 
+FROM market_items 
 WHERE market_id = $1 AND CASE WHEN $2 != '' THEN name_search @@ to_tsquery($2) ELSE TRUE END
 ORDER BY 
     (CASE WHEN $4 = 'ASC' AND $3 = 'popularity' THEN popularity END) ASC,

@@ -1,7 +1,7 @@
 import pog.{type Connection}
 
 pub type ServerContext {
-  ServerContext(generated_directory: String, db: Connection)
+  ServerContext(priv_directory: String, db: Connection)
 }
 
 pub type RequestContext {

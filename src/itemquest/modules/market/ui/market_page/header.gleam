@@ -1,8 +1,6 @@
 import gleam/list
 import gleam/result
-import itemquest/modules/market/internal.{
-  type MarketEntriesSortBy, type SortDirection,
-}
+import itemquest/modules/market/internal.{type MarketSortBy, type SortDirection}
 import itemquest/modules/market/sql.{type SelectMarketRow}
 import itemquest/utils/ui
 import lustre/attribute
@@ -13,7 +11,7 @@ const search_results_container_id = "search_results_container"
 
 pub fn html(
   market: SelectMarketRow,
-  sort_by: MarketEntriesSortBy,
+  sort_by: MarketSortBy,
   sort_direction: SortDirection,
   search: Result(String, Nil),
 ) -> Element(t) {
@@ -36,11 +34,12 @@ fn search_result(name: String) -> Element(t) {
 }
 
 fn search_bar(
-  sort_by: MarketEntriesSortBy,
+  sort_by: MarketSortBy,
   sort_direction: SortDirection,
   search: Result(String, Nil),
 ) -> Element(a) {
   html.search([attribute.class("relative")], [
+    search_script(),
     html.form([], [
       html.input([
         attribute.type_("hidden"),
@@ -72,4 +71,16 @@ fn search_bar(
       [],
     ),
   ])
+}
+
+fn search_script() -> Element(a) {
+  html.script(
+    [
+      attribute.type_("module"),
+      attribute.attribute("data-turbo-permanent", "true"),
+      attribute.id("search_script"),
+      attribute.src("/public/js/market/search.js"),
+    ],
+    "",
+  )
 }

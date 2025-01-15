@@ -10,10 +10,12 @@ pub fn handle_request(req: Request, ctx: ServerContext) -> Response {
   case wisp.path_segments(req) {
     [] -> waitlist.handle_get_waitlist(req)
     ["waitlist"] -> waitlist.handle_post_waitlist(req, ctx)
-    ["markets", id] -> market.handle_get_market_by_id(id, req, ctx)
-    ["markets", id, "entries"] -> market.handle_get_market_entries(id, req, ctx)
-    ["markets", id, "entries", "search"] ->
-      market.handle_get_market_entries_search(id, req, ctx)
+    ["markets", id] -> market.handle_get_market(id, req, ctx)
+    ["markets", id, "items"] -> market.handle_get_market_items(id, req, ctx)
+    ["markets", id, "items", "search"] ->
+      market.handle_get_market_items_search(id, req, ctx)
+    ["markets", market_id, "items", item_id] ->
+      market.handle_get_market_item(market_id, item_id, req, ctx)
     _ -> wisp.redirect("/")
     // todo: return 404 page
   }

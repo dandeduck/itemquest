@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS  market_entries, item_instances, items, waitlist_emails, markets;
+DROP TABLE IF EXISTS  market_items, item_instances, items, waitlist_emails, markets;
 DROP TYPE IF EXISTS item_status, market_status;
 
 CREATE TYPE item_status AS enum (
@@ -34,7 +34,7 @@ CREATE TABLE item_instances (
     created_at       timestamp DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE market_entries (
+CREATE TABLE market_items (
     item_id     serial PRIMARY KEY REFERENCES items, 
     market_id   serial REFERENCES markets,
     name        varchar(31) NOT NULL,

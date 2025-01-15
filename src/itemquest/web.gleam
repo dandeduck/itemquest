@@ -1,9 +1,9 @@
 import gleam/http
 import gleam/int
 import gleam/string
-import itemquest/web/contexts.{type RequestContext, type ServerContext}
 import itemquest/utils/ids
 import itemquest/utils/logging
+import itemquest/web/contexts.{type RequestContext, type ServerContext}
 import wisp.{type Request, type Response}
 
 pub fn middleware(
@@ -18,9 +18,13 @@ pub fn middleware(
   use <- wisp.serve_static(
     req,
     under: "/generated",
-    from: server_ctx.generated_directory,
+    from: server_ctx.priv_directory <> "/generated",
   )
-  use <- wisp.serve_static(req, under: "/static", from: "/public")
+  use <- wisp.serve_static(
+    req,
+    under: "/public",
+    from: server_ctx.priv_directory <> "/public",
+  )
   use <- log_request(req, ctx)
   use <- wisp.rescue_crashes
 

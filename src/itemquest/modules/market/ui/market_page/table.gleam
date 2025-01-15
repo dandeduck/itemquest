@@ -4,9 +4,9 @@ import gleam/list
 import gleam/option.{type Option}
 import gleam/uri.{type Uri}
 import itemquest/modules/market/internal.{
-  type MarketEntriesSortBy, type SortDirection,
+  type MarketSortBy, type SortDirection,
 }
-import itemquest/modules/market/sql.{type SelectMarketEntriesRow}
+import itemquest/modules/market/sql.{type SelectMarketItemsRow}
 import itemquest/utils/ui
 import lustre/attribute
 import lustre/element.{type Element}
@@ -15,8 +15,8 @@ import lustre/element/html
 const market_rows_container_id = "market_rows_container"
 
 pub fn html(
-  market_entries_uri: Uri,
-  sort_by: MarketEntriesSortBy,
+  market_items_uri: Uri,
+  sort_by: MarketSortBy,
   sort_direction: SortDirection,
   search: Result(String, Nil),
 ) -> Element(t) {
@@ -59,19 +59,19 @@ pub fn html(
       ),
       ui.eager_loading_frame(
         [attribute.attribute("data-turbo-stream", "true")],
-        load_from: uri.to_string(market_entries_uri),
+        load_from: uri.to_string(market_items_uri),
       ),
     ]),
   ])
 }
 
-pub fn market_rows_stream(entries: List(SelectMarketEntriesRow)) -> Element(t) {
-  entries
+pub fn market_items_stream(items: List(SelectMarketItemsRow)) -> Element(t) {
+  items
   |> list.map(market_row)
   |> ui.turbo_stream(ui.StreamAppend, market_rows_container_id, _)
 }
 
-fn market_row(entry: SelectMarketEntriesRow) -> Element(t) {
+fn market_row(item: SelectMarketItemsRow) -> Element(t) {
   html.tr(
     [
       attribute.class(
@@ -80,13 +80,13 @@ fn market_row(entry: SelectMarketEntriesRow) -> Element(t) {
     ],
     [
       html.th([], [
-        html.img([attribute.src(entry.image_url), attribute.class("h-10")]),
+        html.img([attribute.src(item.image_url), attribute.class("h-10")]),
       ]),
-      html.th([], [html.text(entry.name)]),
-      html.th([], [html.text(int.to_string(entry.quantity))]),
-      html.th([], [html.text(int.to_string(entry.popularity))]),
+      html.th([], [html.text(item.name)]),
+      html.th([], [html.text(int.to_string(item.quantity))]),
+      html.th([], [html.text(int.to_string(item.popularity))]),
       html.th([], [
-        html.text(case entry.price {
+        html.text(case item.price {
           option.Some(price) -> float.to_string(int.to_float(price) /. 100.0)
           _ -> "-"
         }),
@@ -96,8 +96,8 @@ fn market_row(entry: SelectMarketEntriesRow) -> Element(t) {
 }
 
 fn sorting_header(
-  sort_by: MarketEntriesSortBy,
-  selected_sort_by: MarketEntriesSortBy,
+  sort_by: MarketSortBy,
+  selected_sort_by: MarketSortBy,
   selected_sort_direction: SortDirection,
   search: Result(String, Nil),
 ) -> Element(a) {
@@ -111,7 +111,7 @@ fn sorting_header(
 }
 
 fn header_sorting(
-  sort_by: MarketEntriesSortBy,
+  sort_by: MarketSortBy,
   search: Result(String, Nil),
   selected_direction: Option(SortDirection),
 ) -> Element(a) {

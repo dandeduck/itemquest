@@ -2,51 +2,32 @@ import decode/zero
 import gleam/option.{type Option}
 import pog
 
-/// Insert a row into market_entries with (item_id)
-///
-/// > 🐿️ This function was generated automatically using v2.0.5 of
-/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
-///
-pub fn insert_market_entry(db, arg_1) {
-  let decoder = zero.map(zero.dynamic, fn(_) { Nil })
-
-  let query = "-- Insert a row into market_entries with (item_id)
-INSERT INTO market_entries (item_id)
-VALUES ($1);
-"
-
-  pog.query(query)
-  |> pog.parameter(pog.int(arg_1))
-  |> pog.returning(zero.run(_, decoder))
-  |> pog.execute(db)
-}
-
-/// A row you get from running the `select_market_entry_names` query
-/// defined in `./src/itemquest/modules/market/sql/select_market_entry_names.sql`.
+/// A row you get from running the `select_market_item_names` query
+/// defined in `./src/itemquest/modules/market/sql/select_market_item_names.sql`.
 ///
 /// > 🐿️ This type definition was generated automatically using v2.0.5 of the
 /// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
-pub type SelectMarketEntryNamesRow {
-  SelectMarketEntryNamesRow(name: String, rank: Float)
+pub type SelectMarketItemNamesRow {
+  SelectMarketItemNamesRow(name: String, rank: Float)
 }
 
-/// Select market entry names with (name)
+/// Select market item names with (name)
 ///
 /// > 🐿️ This function was generated automatically using v2.0.5 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
-pub fn select_market_entry_names(db, arg_1, arg_2) {
+pub fn select_market_item_names(db, arg_1, arg_2) {
   let decoder = {
     use name <- zero.field(0, zero.string)
     use rank <- zero.field(1, zero.float)
-    zero.success(SelectMarketEntryNamesRow(name:, rank:))
+    zero.success(SelectMarketItemNamesRow(name:, rank:))
   }
 
   let query = "
--- Select market entry names with (name)
+-- Select market item names with (name)
 SELECT name, ts_rank(name_search, to_tsquery($2)) as rank
-FROM market_entries 
+FROM market_items 
 WHERE market_id = $1 AND name_search @@ to_tsquery($2)
 ORDER BY rank DESC
 LIMIT 10;
@@ -55,64 +36,6 @@ LIMIT 10;
   pog.query(query)
   |> pog.parameter(pog.int(arg_1))
   |> pog.parameter(pog.text(arg_2))
-  |> pog.returning(zero.run(_, decoder))
-  |> pog.execute(db)
-}
-
-/// A row you get from running the `select_market_entries` query
-/// defined in `./src/itemquest/modules/market/sql/select_market_entries.sql`.
-///
-/// > 🐿️ This type definition was generated automatically using v2.0.5 of the
-/// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
-///
-pub type SelectMarketEntriesRow {
-  SelectMarketEntriesRow(
-    name: String,
-    image_url: String,
-    quantity: Int,
-    popularity: Int,
-    price: Option(Int),
-  )
-}
-
-/// Select market entries with (market_id, search, sort_by, sort_direction, limit, offset)
-///
-/// > 🐿️ This function was generated automatically using v2.0.5 of
-/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
-///
-pub fn select_market_entries(db, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6) {
-  let decoder = {
-    use name <- zero.field(0, zero.string)
-    use image_url <- zero.field(1, zero.string)
-    use quantity <- zero.field(2, zero.int)
-    use popularity <- zero.field(3, zero.int)
-    use price <- zero.field(4, zero.optional(zero.int))
-    zero.success(
-      SelectMarketEntriesRow(name:, image_url:, quantity:, popularity:, price:),
-    )
-  }
-
-  let query = "-- Select market entries with (market_id, search, sort_by, sort_direction, limit, offset)
-SELECT name, image_url, quantity, popularity, price
-FROM market_entries 
-WHERE market_id = $1 AND CASE WHEN $2 != '' THEN name_search @@ to_tsquery($2) ELSE TRUE END
-ORDER BY 
-    (CASE WHEN $4 = 'ASC' AND $3 = 'popularity' THEN popularity END) ASC,
-    (CASE WHEN $4 = 'DESC' AND $3 = 'popularity' THEN popularity END) DESC,
-    (CASE WHEN $4 = 'ASC' AND $3 = 'price' THEN price END) ASC NULLS FIRST,
-    (CASE WHEN $4 = 'DESC' AND $3 = 'price' THEN price END) DESC NULLS LAST,
-    (CASE WHEN $4 = 'ASC' AND $3 = 'quantity' THEN quantity END) ASC,
-    (CASE WHEN $4 = 'DESC' AND $3 = 'quantity' THEN quantity END) DESC
-LIMIT $5 OFFSET $6;
-"
-
-  pog.query(query)
-  |> pog.parameter(pog.int(arg_1))
-  |> pog.parameter(pog.text(arg_2))
-  |> pog.parameter(pog.text(arg_3))
-  |> pog.parameter(pog.text(arg_4))
-  |> pog.parameter(pog.int(arg_5))
-  |> pog.parameter(pog.int(arg_6))
   |> pog.returning(zero.run(_, decoder))
   |> pog.execute(db)
 }
@@ -156,6 +79,64 @@ pub fn select_market(db, arg_1) {
 
   pog.query(query)
   |> pog.parameter(pog.int(arg_1))
+  |> pog.returning(zero.run(_, decoder))
+  |> pog.execute(db)
+}
+
+/// A row you get from running the `select_market_items` query
+/// defined in `./src/itemquest/modules/market/sql/select_market_items.sql`.
+///
+/// > 🐿️ This type definition was generated automatically using v2.0.5 of the
+/// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub type SelectMarketItemsRow {
+  SelectMarketItemsRow(
+    name: String,
+    image_url: String,
+    quantity: Int,
+    popularity: Int,
+    price: Option(Int),
+  )
+}
+
+/// Select market items with (market_id, search, sort_by, sort_direction, limit, offset)
+///
+/// > 🐿️ This function was generated automatically using v2.0.5 of
+/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub fn select_market_items(db, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6) {
+  let decoder = {
+    use name <- zero.field(0, zero.string)
+    use image_url <- zero.field(1, zero.string)
+    use quantity <- zero.field(2, zero.int)
+    use popularity <- zero.field(3, zero.int)
+    use price <- zero.field(4, zero.optional(zero.int))
+    zero.success(
+      SelectMarketItemsRow(name:, image_url:, quantity:, popularity:, price:),
+    )
+  }
+
+  let query = "-- Select market items with (market_id, search, sort_by, sort_direction, limit, offset)
+SELECT name, image_url, quantity, popularity, price
+FROM market_items 
+WHERE market_id = $1 AND CASE WHEN $2 != '' THEN name_search @@ to_tsquery($2) ELSE TRUE END
+ORDER BY 
+    (CASE WHEN $4 = 'ASC' AND $3 = 'popularity' THEN popularity END) ASC,
+    (CASE WHEN $4 = 'DESC' AND $3 = 'popularity' THEN popularity END) DESC,
+    (CASE WHEN $4 = 'ASC' AND $3 = 'price' THEN price END) ASC NULLS FIRST,
+    (CASE WHEN $4 = 'DESC' AND $3 = 'price' THEN price END) DESC NULLS LAST,
+    (CASE WHEN $4 = 'ASC' AND $3 = 'quantity' THEN quantity END) ASC,
+    (CASE WHEN $4 = 'DESC' AND $3 = 'quantity' THEN quantity END) DESC
+LIMIT $5 OFFSET $6;
+"
+
+  pog.query(query)
+  |> pog.parameter(pog.int(arg_1))
+  |> pog.parameter(pog.text(arg_2))
+  |> pog.parameter(pog.text(arg_3))
+  |> pog.parameter(pog.text(arg_4))
+  |> pog.parameter(pog.int(arg_5))
+  |> pog.parameter(pog.int(arg_6))
   |> pog.returning(zero.run(_, decoder))
   |> pog.execute(db)
 }

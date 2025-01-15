@@ -12,7 +12,9 @@ pub fn layout(page: Element(t)) -> Element(t) {
       ]),
       icons(),
       tailwind(),
-      ..turbo_scripts()
+      charts_script(),
+      import_map_script(),
+      turbo_script(),
     ]),
     html.body([attribute.class("text-black bg-white")], [header(), main(page)]),
   ])
@@ -31,22 +33,35 @@ fn tailwind() -> Element(t) {
   html.link([
     attribute.rel("stylesheet"),
     attribute.type_("text/css"),
-    attribute.href("/generated/css/app.css"),
+    attribute.href("/generated/css/tailwind.css"),
   ])
 }
 
-fn turbo_scripts() -> List(Element(t)) {
-  [
-    html.script(
-      [attribute.type_("importmap")],
-      " {
-            \"imports\": {
-                \"turbo\": \"https://unpkg.com/@hotwired/turbo@8.0.10/dist/turbo.es2017-esm.js\"
-            }
-        }",
-    ),
-    html.script([attribute.type_("module")], "import * as turbo from 'turbo'"),
-  ]
+fn charts_script() -> Element(t) {
+  html.script(
+    [
+      attribute.src(
+        "https://cdn.jsdelivr.net/npm/chart.js@4.4/dist/chart.umd.min.js",
+      ),
+    ],
+    "",
+  )
+}
+
+fn turbo_script() -> Element(t) {
+  html.script([attribute.type_("module")], "import * as turbo from 'turbo'")
+}
+
+fn import_map_script() -> Element(t) {
+  html.script(
+    [attribute.type_("importmap")],
+    " {
+        \"imports\": {
+            \"turbo\": \"https://unpkg.com/@hotwired/turbo@8.0.10/dist/turbo.es2017-esm.js\",
+            \"@itemquest/utils\": \"/public/js/utils.js\"
+         }
+      }",
+  )
 }
 
 fn main(page: Element(t)) -> Element(t) {

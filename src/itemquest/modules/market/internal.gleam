@@ -3,21 +3,20 @@ import gleam/result
 import gleam/string
 import gleam/uri
 import itemquest/modules/market/sql.{
-  type SelectMarketEntriesRow, type SelectMarketRow,
+  type SelectMarketItemsRow, type SelectMarketRow,
 }
 import itemquest/web/contexts.{type RequestContext}
 import itemquest/web/errors.{type InternalError}
 
-pub fn create_market_entry(
-  item_id: Int,
-  ctx: RequestContext,
-) -> Result(Nil, InternalError(Nil)) {
-  use _, _ <- errors.try_query(sql.insert_market_entry(ctx.db, item_id))
-  Ok(Nil)
-}
-
 pub type SelectMarketError {
   MarketNotFound
+}
+
+pub fn create_market_item(
+  _item_id: Int,
+  _ctx: RequestContext,
+) -> Result(Nil, InternalError(Nil)) {
+  todo
 }
 
 pub fn select_market(
@@ -37,13 +36,13 @@ pub const sort_by_touples = [
   #("popularity", SortByPopularity),
 ]
 
-pub type MarketEntriesSortBy {
+pub type MarketSortBy {
   SortByPrice
   SortByQuantity
   SortByPopularity
 }
 
-pub fn sort_by_to_string(sort_by: MarketEntriesSortBy) -> String {
+pub fn sort_by_to_string(sort_by: MarketSortBy) -> String {
   case sort_by {
     SortByPrice -> "price"
     SortByQuantity -> "quantity"
@@ -51,11 +50,11 @@ pub fn sort_by_to_string(sort_by: MarketEntriesSortBy) -> String {
   }
 }
 
-pub type MarketEntriesFilter {
-  MarketEntriesFilter(
+pub type MarketItemsFilter {
+  MarketItemsFilter(
     market_id: Int,
     search: Result(String, Nil),
-    sort_by: MarketEntriesSortBy,
+    sort_by: MarketSortBy,
     sort_direction: SortDirection,
     limit: Int,
     offset: Int,
@@ -79,7 +78,7 @@ pub fn sort_direction_to_string(sort_direction: SortDirection) -> String {
 }
 
 pub fn get_market_query(
-  sort_by: MarketEntriesSortBy,
+  sort_by: MarketSortBy,
   sort_direction: SortDirection,
   search: Result(String, Nil),
 ) -> String {
@@ -96,13 +95,13 @@ pub fn get_market_query(
   |> uri.query_to_string
 }
 
-pub fn get_market_entries(
-  filter: MarketEntriesFilter,
+pub fn get_market_items(
+  filter: MarketItemsFilter,
   ctx: RequestContext,
-) -> Result(List(SelectMarketEntriesRow), InternalError(Nil)) {
+) -> Result(List(SelectMarketItemsRow), InternalError(Nil)) {
   let search = handle_search(filter.search, name_query, fn() { "" })
 
-  use _, rows <- errors.try_query(sql.select_market_entries(
+  use _, rows <- errors.try_query(sql.select_market_items(
     ctx.db,
     filter.market_id,
     search,
@@ -129,12 +128,12 @@ fn handle_search(
   }
 }
 
-pub fn search_market_entry_names(
+pub fn search_market_item_names(
   market_id: Int,
   search: String,
   ctx: RequestContext,
 ) -> Result(List(String), InternalError(Nil)) {
-  use _, rows <- errors.try_query(sql.select_market_entry_names(
+  use _, rows <- errors.try_query(sql.select_market_item_names(
     ctx.db,
     market_id,
     name_query(search),

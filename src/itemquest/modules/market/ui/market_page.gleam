@@ -1,34 +1,34 @@
 import gleam/uri.{type Uri}
-import itemquest/modules/market/internal.{
-  type MarketEntriesSortBy, type SortDirection,
-}
-import itemquest/modules/market/sql.{
-  type SelectMarketEntriesRow, type SelectMarketRow,
-}
+import itemquest/modules/market/internal.{type MarketSortBy, type SortDirection}
+import itemquest/modules/market/sql.{type SelectMarketRow}
 import itemquest/modules/market/ui/market_page/header
-import itemquest/modules/market/ui/market_page/script
 import itemquest/modules/market/ui/market_page/table
+import lustre/attribute
 import lustre/element.{type Element}
 import lustre/element/html
 
 pub fn page(
   market: SelectMarketRow,
-  market_entries_uri: Uri,
-  sort_by: MarketEntriesSortBy,
+  market_items_uri: Uri,
+  sort_by: MarketSortBy,
   sort_direction: SortDirection,
   search: Result(String, Nil),
 ) -> Element(t) {
   html.section([], [
-    script.html(),
+    html.script(
+      [
+        attribute.type_("module"),
+        attribute.attribute("data-turbo-permanent", "true"),
+        attribute.id("market_script"),
+        attribute.src("/public/js/market/page.js"),
+      ],
+      "",
+    ),
     header.html(market, sort_by, sort_direction, search),
-    table.html(market_entries_uri, sort_by, sort_direction, search),
+    table.html(market_items_uri, sort_by, sort_direction, search),
   ])
 }
 
-pub fn search_results_stream(names: List(String)) -> Element(t) {
-  header.search_results_stream(names)
-}
+pub const search_results_stream = header.search_results_stream
 
-pub fn market_rows_stream(entries: List(SelectMarketEntriesRow)) -> Element(t) {
-  table.market_rows_stream(entries)
-}
+pub const market_rows_stream = table.market_items_stream

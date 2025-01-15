@@ -7,7 +7,7 @@ import itemquest/web/errors.{type InternalError}
 
 pub type MarketMessage {
   Shutdown
-  CreateMarketEntry(item_id: Int, ctx: RequestContext)
+  CreateMarketItem(item_id: Int, ctx: RequestContext)
 }
 
 pub fn new() -> Result(process.Subject(MarketMessage), actor.StartError) {
@@ -20,16 +20,16 @@ fn handle_message(
 ) -> Next(MarketMessage, List(MarketMessage)) {
   case message {
     Shutdown -> actor.Stop(process.Normal)
-    CreateMarketEntry(item_id, ctx) -> {
-      logging.log_info("Incomming CreateMarketEntry message", ctx)
-      internal.create_market_entry(item_id, ctx)
+    CreateMarketItem(item_id, ctx) -> {
+      logging.log_info("Incomming CreateMarketItem message", ctx)
+      internal.create_market_item(item_id, ctx)
       |> handle_result(ctx, message, failed_messages)
     }
   }
 }
 
 fn handle_result(
-  result: Result(t, InternalError(Nil)),
+  result: Result(t, InternalError(e)),
   ctx: RequestContext,
   message: MarketMessage,
   failed_messages: List(MarketMessage),

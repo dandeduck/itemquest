@@ -12,7 +12,7 @@ import itemquest/web/contexts.{type RequestContext}
 import lustre/element
 import wisp.{type Request, type Response}
 
-pub fn handle_get_market_by_id(
+pub fn handle_get_market(
   market_id: String,
   req: Request,
   ctx: RequestContext,
@@ -25,13 +25,13 @@ pub fn handle_get_market_by_id(
   let sort_direction =
     handling.optional_list_key(query, "sort_direction", "desc")
 
-  let market_entries_uri =
+  let market_items_uri =
     uri.Uri(
       option.None,
       option.None,
       option.None,
       option.None,
-      "/markets/" <> market_id <> "/entries",
+      "/markets/" <> market_id <> "/items",
       req.query,
       option.None,
     )
@@ -45,7 +45,7 @@ pub fn handle_get_market_by_id(
 
   use market <- require_market(market_id, ctx)
 
-  market_page.page(market, market_entries_uri, sort_by, sort_direction, search)
+  market_page.page(market, market_items_uri, sort_by, sort_direction, search)
   |> layout.layout
   |> element.to_document_string_builder
   |> wisp.html_response(200)
@@ -63,7 +63,7 @@ fn require_market(
   }
 }
 
-pub fn handle_get_market_entries(
+pub fn handle_get_market_items(
   market_id: String,
   req: Request,
   ctx: RequestContext,
@@ -87,8 +87,8 @@ pub fn handle_get_market_entries(
   use offset <- handling.require_int_string(offset)
 
   case
-    internal.get_market_entries(
-      internal.MarketEntriesFilter(
+    internal.get_market_items(
+      internal.MarketItemsFilter(
         market_id:,
         search:,
         sort_by:,
@@ -99,11 +99,11 @@ pub fn handle_get_market_entries(
       ctx,
     )
   {
-    Ok(entries) ->
-      case entries {
+    Ok(items) ->
+      case items {
         [] -> wisp.no_content()
         _ ->
-          market_page.market_rows_stream(entries)
+          market_page.market_rows_stream(items)
           |> element.to_document_string_builder
           |> handling.turbo_stream_html_response(200)
       }
@@ -112,7 +112,7 @@ pub fn handle_get_market_entries(
   }
 }
 
-pub fn handle_get_market_entries_search(
+pub fn handle_get_market_items_search(
   market_id: String,
   req: Request,
   ctx: RequestContext,
@@ -126,7 +126,7 @@ pub fn handle_get_market_entries_search(
 
   let names = case search {
     "" -> Ok([])
-    _ -> internal.search_market_entry_names(market_id, search, ctx)
+    _ -> internal.search_market_item_names(market_id, search, ctx)
   }
 
   case names {
@@ -139,4 +139,18 @@ pub fn handle_get_market_entries_search(
     // todo: show somethin' bro
     Error(_) -> wisp.internal_server_error()
   }
+}
+
+pub fn handle_get_market_item(
+  market_id: String,
+  item_id: String,
+  req: Request,
+  ctx: RequestContext,
+) -> Response {
+  use <- wisp.require_method(req, http.Get)
+
+  use market_id <- handling.require_int_string(market_id)
+  use item_id <- handling.require_int_string(item_id)
+
+  wisp.ok()
 }
