@@ -100,13 +100,7 @@ pub fn get_market_entries(
   filter: MarketEntriesFilter,
   ctx: RequestContext,
 ) -> Result(List(SelectMarketEntriesRow), InternalError(Nil)) {
-  let search =
-    handle_search(
-      filter.search,
-      // todo: check if we need to replace " " with <-> instead
-      fn(search) { string.replace(search, each: " ", with: "+") <> ":*" },
-      fn() { "" },
-    )
+  let search = handle_search(filter.search, name_query, fn() { "" })
 
   use _, rows <- errors.try_query(sql.select_market_entries(
     ctx.db,
@@ -143,10 +137,15 @@ pub fn search_market_entry_names(
   use _, rows <- errors.try_query(sql.select_market_entry_names(
     ctx.db,
     market_id,
-    search,
+    name_query(search),
   ))
 
   rows
   |> list.map(fn(row) { row.name })
   |> Ok
+}
+
+fn name_query(search: String) {
+  // todo: check if we need to replace " " with <-> instead
+  string.replace(search, each: " ", with: "+") <> ":*"
 }

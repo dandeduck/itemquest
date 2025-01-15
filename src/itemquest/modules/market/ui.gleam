@@ -85,9 +85,7 @@ pub fn page(
 pub fn search_results(names: List(String)) -> Element(t) {
   names
   |> list.map(search_result)
-  |> html.div([attribute.id(search_results_container_id)], _)
-  |> list.wrap
-  |> ui.turbo_stream(ui.StreamReplace, search_results_container_id, _)
+  |> ui.turbo_stream(ui.StreamUpdate, search_results_container_id, _)
 }
 
 fn search_result(name: String) -> Element(t) {
@@ -151,11 +149,14 @@ fn on_load_script() -> Element(a) {
             }, 0)
         })
 
-        document.getElementById('search_input').addEventListener('keypress', event => {
+        document.getElementById('search_input').addEventListener('keyup', event => {
+            const value = event.target.value
             const searchUrl = new URL(window.location.href)
+
             searchUrl.pathname += '/entries/search'
             searchUrl.search = ''
-            searchUrl.searchParams.append('search', event.target.value)
+            searchUrl.searchParams.append('search', value)
+
             fetchStream(searchUrl.toString())
         })
 
@@ -184,7 +185,7 @@ fn search_bar(
   sort_direction: SortDirection,
   search: Result(String, Nil),
 ) -> Element(a) {
-  html.search([], [
+  html.search([attribute.class("relative")], [
     html.form([], [
       html.input([
         attribute.type_("hidden"),
@@ -207,7 +208,10 @@ fn search_bar(
         attribute.class("w-full"),
       ]),
     ]),
-    html.div([attribute.id(search_results_container_id)], []),
+    html.div(
+      [attribute.id(search_results_container_id), attribute.class("absolute bg-gray w-full")],
+      [],
+    ),
   ])
 }
 

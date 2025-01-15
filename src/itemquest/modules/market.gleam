@@ -1,4 +1,5 @@
 import gleam/http
+import gleam/io
 import gleam/list
 import gleam/option
 import gleam/uri
@@ -123,11 +124,18 @@ pub fn handle_get_market_entries_search(
   use market_id <- handling.require_int_string(market_id)
   use search <- handling.require_ok_result(search)
 
-  case internal.search_market_entry_names(market_id, search, ctx) {
-    Ok(names) ->
+  let names = case search {
+    "" -> Ok([])
+    _ -> internal.search_market_entry_names(market_id, search, ctx)
+  }
+
+  case names {
+    Ok(names) -> {
+      io.debug(names)
       ui.search_results(names)
       |> element.to_document_string_builder
       |> handling.turbo_stream_html_response(200)
+    }
     // todo: show somethin' bro
     Error(_) -> wisp.internal_server_error()
   }
