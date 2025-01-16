@@ -75,12 +75,7 @@ fn search_bar(
 
 fn search_script() -> Element(a) {
   html.script(
-    [
-      attribute.type_("module"),
-      attribute.attribute("data-turbo-permanent", "true"),
-      attribute.id("search_script"),
-      attribute.src("/public/js/market/search.js"),
-    ],
+    [attribute.type_("module"), attribute.src("/public/js/market/search.js")],
     "",
   )
 }

@@ -1,7 +1,6 @@
 import utils from "@itemquest/utils";
 
-document.addEventListener("turbo:visit", () => {
-    console.log('hello');
+document.addEventListener("turbo:load", () => {
     let prevSearch = "";
 
     document

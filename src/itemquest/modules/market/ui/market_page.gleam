@@ -16,12 +16,7 @@ pub fn page(
 ) -> Element(t) {
   html.section([], [
     html.script(
-      [
-        attribute.type_("module"),
-        attribute.attribute("data-turbo-permanent", "true"),
-        attribute.id("market_script"),
-        attribute.src("/public/js/market/page.js"),
-      ],
+      [attribute.type_("module"), attribute.src("/public/js/market/page.js")],
       "",
     ),
     header.html(market, sort_by, sort_direction, search),
