@@ -5,10 +5,12 @@ import gleam/option
 import gleam/uri
 import itemquest/modules/market/internal
 import itemquest/modules/market/sql.{type SelectMarketRow}
+import itemquest/modules/market/ui/item_page
 import itemquest/modules/market/ui/market_page
 import itemquest/utils/handling
 import itemquest/utils/ui/layout
 import itemquest/web/contexts.{type RequestContext}
+import itemquest/web/errors
 import lustre/element
 import wisp.{type Request, type Response}
 
@@ -131,8 +133,8 @@ pub fn handle_get_market_items_search(
 
   case names {
     Ok(names) -> {
-      io.debug(names)
-      market_page.search_results_stream(names)
+      names
+      |> market_page.search_results_stream
       |> element.to_document_string_builder
       |> handling.turbo_stream_html_response(200)
     }
@@ -152,5 +154,16 @@ pub fn handle_get_market_item(
   use market_id <- handling.require_int_string(market_id)
   use item_id <- handling.require_int_string(item_id)
 
-  wisp.ok()
+  case internal.get_market_item(item_id, ctx) {
+    Ok(item) ->
+      item
+      |> item_page.page
+      |> element.to_document_string_builder
+      |> wisp.html_response(200)
+    Error(error) ->
+      case error {
+        errors.Business(_, internal.ItemNotFoundError) -> wisp.not_found()
+        _ -> wisp.internal_server_error()
+      }
+  }
 }

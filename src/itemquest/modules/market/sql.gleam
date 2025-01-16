@@ -2,6 +2,41 @@ import decode/zero
 import gleam/option.{type Option}
 import pog
 
+/// A row you get from running the `select_market_item` query
+/// defined in `./src/itemquest/modules/market/sql/select_market_item.sql`.
+///
+/// > 🐿️ This type definition was generated automatically using v2.0.5 of the
+/// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub type SelectMarketItemRow {
+  SelectMarketItemRow(name: String, image_url: String, price: Option(Int))
+}
+
+/// Runs the `select_market_item` query
+/// defined in `./src/itemquest/modules/market/sql/select_market_item.sql`.
+///
+/// > 🐿️ This function was generated automatically using v2.0.5 of
+/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub fn select_market_item(db, arg_1) {
+  let decoder = {
+    use name <- zero.field(0, zero.string)
+    use image_url <- zero.field(1, zero.string)
+    use price <- zero.field(2, zero.optional(zero.int))
+    zero.success(SelectMarketItemRow(name:, image_url:, price:))
+  }
+
+  let query = "SELECT name, image_url, price
+FROM market_items
+WHERE item_id = $1;
+"
+
+  pog.query(query)
+  |> pog.parameter(pog.int(arg_1))
+  |> pog.returning(zero.run(_, decoder))
+  |> pog.execute(db)
+}
+
 /// A row you get from running the `select_market_item_names` query
 /// defined in `./src/itemquest/modules/market/sql/select_market_item_names.sql`.
 ///
@@ -36,6 +71,40 @@ LIMIT 10;
   pog.query(query)
   |> pog.parameter(pog.int(arg_1))
   |> pog.parameter(pog.text(arg_2))
+  |> pog.returning(zero.run(_, decoder))
+  |> pog.execute(db)
+}
+
+/// A row you get from running the `select_hourly_item_prices` query
+/// defined in `./src/itemquest/modules/market/sql/select_hourly_item_prices.sql`.
+///
+/// > 🐿️ This type definition was generated automatically using v2.0.5 of the
+/// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub type SelectHourlyItemPricesRow {
+  SelectHourlyItemPricesRow(price: Option(Int), time: Option(pog.Timestamp))
+}
+
+/// Selects all price+time rows by (item_id) using hourly_item_prices view
+///
+/// > 🐿️ This function was generated automatically using v2.0.5 of
+/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub fn select_hourly_item_prices(db, arg_1) {
+  let decoder = {
+    use price <- zero.field(0, zero.optional(zero.int))
+    use time <- zero.field(1, zero.optional(timestamp_decoder()))
+    zero.success(SelectHourlyItemPricesRow(price:, time:))
+  }
+
+  let query = "-- Selects all price+time rows by (item_id) using hourly_item_prices view
+SELECT price, time
+FROM hourly_item_prices
+WHERE item_id = $1;
+"
+
+  pog.query(query)
+  |> pog.parameter(pog.int(arg_1))
   |> pog.returning(zero.run(_, decoder))
   |> pog.execute(db)
 }
@@ -137,6 +206,40 @@ LIMIT $5 OFFSET $6;
   |> pog.parameter(pog.text(arg_4))
   |> pog.parameter(pog.int(arg_5))
   |> pog.parameter(pog.int(arg_6))
+  |> pog.returning(zero.run(_, decoder))
+  |> pog.execute(db)
+}
+
+/// A row you get from running the `select_daily_item_prices` query
+/// defined in `./src/itemquest/modules/market/sql/select_daily_item_prices.sql`.
+///
+/// > 🐿️ This type definition was generated automatically using v2.0.5 of the
+/// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub type SelectDailyItemPricesRow {
+  SelectDailyItemPricesRow(price: Option(Int), time: Option(pog.Timestamp))
+}
+
+/// Selects all price+time rows by (item_id) using daily_item_prices view
+///
+/// > 🐿️ This function was generated automatically using v2.0.5 of
+/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub fn select_daily_item_prices(db, arg_1) {
+  let decoder = {
+    use price <- zero.field(0, zero.optional(zero.int))
+    use time <- zero.field(1, zero.optional(timestamp_decoder()))
+    zero.success(SelectDailyItemPricesRow(price:, time:))
+  }
+
+  let query = "-- Selects all price+time rows by (item_id) using daily_item_prices view
+SELECT price, time
+FROM daily_item_prices
+WHERE item_id = $1;
+"
+
+  pog.query(query)
+  |> pog.parameter(pog.int(arg_1))
   |> pog.returning(zero.run(_, decoder))
   |> pog.execute(db)
 }

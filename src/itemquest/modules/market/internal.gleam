@@ -1,9 +1,10 @@
+import gleam/int
 import gleam/list
 import gleam/result
 import gleam/string
 import gleam/uri
 import itemquest/modules/market/sql.{
-  type SelectMarketItemsRow, type SelectMarketRow,
+  type SelectMarketItemRow, type SelectMarketItemsRow, type SelectMarketRow,
 }
 import itemquest/web/contexts.{type RequestContext}
 import itemquest/web/errors.{type InternalError}
@@ -147,4 +148,25 @@ pub fn search_market_item_names(
 fn name_query(search: String) {
   // todo: check if we need to replace " " with <-> instead
   string.replace(search, each: " ", with: "+") <> ":*"
+}
+
+pub type GetMarketItemError {
+  ItemNotFoundError
+}
+
+pub fn get_market_item(
+  item_id: Int,
+  ctx: RequestContext,
+) -> Result(SelectMarketItemRow, InternalError(GetMarketItemError)) {
+  use _, rows <- errors.try_query(sql.select_market_item(ctx.db, item_id))
+
+  case rows {
+    [item, ..] -> Ok(item)
+    [] ->
+      errors.Business(
+        "Item with id: " <> int.to_string(item_id) <> " was not found",
+        ItemNotFoundError,
+      )
+      |> Error
+  }
 }
