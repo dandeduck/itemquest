@@ -4,7 +4,7 @@ const limit = 25;
 let offset = 0;
 let fetching = false;
 
-window.addEventListener("scroll", () => {
+document.addEventListener("scroll", () => {
     const itemsUrl = new URL(window.location.href);
     itemsUrl.pathname += "/items";
 
@@ -26,7 +26,7 @@ window.addEventListener("scroll", () => {
     }, 0);
 });
 
-window.addEventListener("turbo:visit", () => {
+document.addEventListener("turbo:visit", () => {
     offset = 0;
     fetching = false;
 });

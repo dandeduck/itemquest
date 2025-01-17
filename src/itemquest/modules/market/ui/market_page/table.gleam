@@ -63,19 +63,19 @@ pub fn html(
   ])
 }
 
-pub fn market_items_stream(items: List(SelectMarketItemsRow)) -> Element(t) {
+pub fn market_items_stream(market_id: Int, items: List(SelectMarketItemsRow)) -> Element(t) {
   items
-  |> list.map(market_row)
+  |> list.map(market_row(_, market_id))
   |> ui.turbo_stream(ui.StreamAppend, market_rows_container_id, _)
 }
 
-fn market_row(item: SelectMarketItemsRow) -> Element(t) {
+fn market_row(item: SelectMarketItemsRow, market_id: Int) -> Element(t) {
   html.tr(
     [
       attribute.class(
         "[&>*]:text-start [&>:not(:last-child)]:pr-10 [&>*]:p-2 [&>*]:border-y-8 [&>*]:border-white bg-gray",
       ),
-      ui.turbo_visit_attribute("./items/" <> int.to_string(item.item_id)),
+      ui.turbo_visit_attribute(int.to_string(market_id) <> "/items/" <> int.to_string(item.item_id)),
     ],
     [
       html.td([], [

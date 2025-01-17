@@ -75,7 +75,18 @@ fn search_bar(
 
 fn search_script() -> Element(a) {
   html.script(
-    [attribute.type_("module"), attribute.src("/public/js/market/search.js")],
-    "",
+    [attribute.type_("module")],
+    "
+        import utils from '@itemquest/utils';
+
+        utils.addAutocompleteSuggestions('search_input', (value) => {
+            const searchUrl = new URL(window.location.href);
+            searchUrl.pathname += '/items/search';
+            searchUrl.search = '';
+            searchUrl.searchParams.append('search', value);
+
+            return searchUrl.toString();
+        });
+    ",
   )
 }

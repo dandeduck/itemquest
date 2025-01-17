@@ -1,2 +1,2 @@
- gleam run -m tailwind/run
+ gleam run -m tailwind/run &
  gleam run &

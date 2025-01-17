@@ -19,4 +19,25 @@ async function fetchStream(url) {
     return true;
 }
 
-export default { fetchStream };
+/**
+ * @param {string} elementId
+ * @param {(value: string) => string} getSuggestionsUrl
+ * @returns {Promise<boolean>}
+ */
+function addAutocompleteSuggestions(elementId, getSuggestionsUrl) {
+    document.getElementById(elementId)?.addEventListener("keyup", (event) => {
+        const value = event.target.value;
+        const prevValue = event.target.getAttribute("data-prev-value");
+
+        if (prevValue === value) {
+            return;
+        }
+
+        event.target.setAttribute("data-prev-value", value);
+        const url = getSuggestionsUrl(value);
+
+        return fetchStream(url);
+    });
+}
+
+export default { fetchStream, addAutocompleteSuggestions };

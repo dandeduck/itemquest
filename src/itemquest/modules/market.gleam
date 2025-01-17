@@ -1,5 +1,4 @@
 import gleam/http
-import gleam/io
 import gleam/list
 import gleam/option
 import gleam/uri
@@ -105,7 +104,7 @@ pub fn handle_get_market_items(
       case items {
         [] -> wisp.no_content()
         _ ->
-          market_page.market_rows_stream(items)
+          market_page.market_rows_stream(market_id, items)
           |> element.to_document_string_builder
           |> handling.turbo_stream_html_response(200)
       }
@@ -158,6 +157,7 @@ pub fn handle_get_market_item(
     Ok(item) ->
       item
       |> item_page.page
+      |> layout.layout
       |> element.to_document_string_builder
       |> wisp.html_response(200)
     Error(error) ->
