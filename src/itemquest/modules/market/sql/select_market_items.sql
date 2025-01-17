@@ -1,5 +1,5 @@
 -- Select market items with (market_id, search, sort_by, sort_direction, limit, offset)
-SELECT name, image_url, quantity, popularity, price
+SELECT item_id, name, image_url, quantity, popularity, price
 FROM market_items 
 WHERE market_id = $1 AND CASE WHEN $2 != '' THEN name_search @@ to_tsquery($2) ELSE TRUE END
 ORDER BY 

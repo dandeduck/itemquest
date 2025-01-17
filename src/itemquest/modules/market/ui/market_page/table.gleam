@@ -3,9 +3,7 @@ import gleam/int
 import gleam/list
 import gleam/option.{type Option}
 import gleam/uri.{type Uri}
-import itemquest/modules/market/internal.{
-  type MarketSortBy, type SortDirection,
-}
+import itemquest/modules/market/internal.{type MarketSortBy, type SortDirection}
 import itemquest/modules/market/sql.{type SelectMarketItemsRow}
 import itemquest/utils/ui
 import lustre/attribute
@@ -77,15 +75,16 @@ fn market_row(item: SelectMarketItemsRow) -> Element(t) {
       attribute.class(
         "[&>*]:text-start [&>:not(:last-child)]:pr-10 [&>*]:p-2 [&>*]:border-y-8 [&>*]:border-white bg-gray",
       ),
+      ui.turbo_visit_attribute("./items/" <> int.to_string(item.item_id)),
     ],
     [
-      html.th([], [
+      html.td([], [
         html.img([attribute.src(item.image_url), attribute.class("h-10")]),
       ]),
-      html.th([], [html.text(item.name)]),
-      html.th([], [html.text(int.to_string(item.quantity))]),
-      html.th([], [html.text(int.to_string(item.popularity))]),
-      html.th([], [
+      html.td([], [html.text(item.name)]),
+      html.td([], [html.text(int.to_string(item.quantity))]),
+      html.td([], [html.text(int.to_string(item.popularity))]),
+      html.td([], [
         html.text(case item.price {
           option.Some(price) -> float.to_string(int.to_float(price) /. 100.0)
           _ -> "-"

@@ -160,6 +160,7 @@ pub fn select_market(db, arg_1) {
 ///
 pub type SelectMarketItemsRow {
   SelectMarketItemsRow(
+    item_id: Int,
     name: String,
     image_url: String,
     quantity: Int,
@@ -175,18 +176,26 @@ pub type SelectMarketItemsRow {
 ///
 pub fn select_market_items(db, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6) {
   let decoder = {
-    use name <- zero.field(0, zero.string)
-    use image_url <- zero.field(1, zero.string)
-    use quantity <- zero.field(2, zero.int)
-    use popularity <- zero.field(3, zero.int)
-    use price <- zero.field(4, zero.optional(zero.int))
+    use item_id <- zero.field(0, zero.int)
+    use name <- zero.field(1, zero.string)
+    use image_url <- zero.field(2, zero.string)
+    use quantity <- zero.field(3, zero.int)
+    use popularity <- zero.field(4, zero.int)
+    use price <- zero.field(5, zero.optional(zero.int))
     zero.success(
-      SelectMarketItemsRow(name:, image_url:, quantity:, popularity:, price:),
+      SelectMarketItemsRow(
+        item_id:,
+        name:,
+        image_url:,
+        quantity:,
+        popularity:,
+        price:,
+      ),
     )
   }
 
   let query = "-- Select market items with (market_id, search, sort_by, sort_direction, limit, offset)
-SELECT name, image_url, quantity, popularity, price
+SELECT item_id, name, image_url, quantity, popularity, price
 FROM market_items 
 WHERE market_id = $1 AND CASE WHEN $2 != '' THEN name_search @@ to_tsquery($2) ELSE TRUE END
 ORDER BY 

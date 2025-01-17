@@ -1,7 +1,7 @@
+import gleam/option.{type Option}
 import lustre/attribute.{type Attribute}
 import lustre/element.{type Element}
 import lustre/element/html
-import gleam/option.{type Option}
 
 pub fn eager_loading_frame(
   attr: List(Attribute(t)),
@@ -56,7 +56,17 @@ pub fn turbo_stream_source() -> Element(t) {
 }
 
 pub fn icon(name: String, class: Option(String)) -> Element(t) {
-  html.span([attribute.class("material-symbols-outlined flex items-center justify-center " <> option.unwrap(class, ""))], [
-    html.text(name),
-  ])
+  html.span(
+    [
+      attribute.class(
+        "material-symbols-outlined flex items-center justify-center "
+        <> option.unwrap(class, ""),
+      ),
+    ],
+    [html.text(name)],
+  )
+}
+
+pub fn turbo_visit_attribute(path: String) -> Attribute(t) {
+  attribute.attribute("data-turbo-visit", path)
 }
