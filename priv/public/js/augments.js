@@ -20,10 +20,9 @@ function addTurboVisits() {
 function addTurboVisit(element) {
     const path = element.getAttribute(turboVisitAttribute);
 
-    if (!path) {
+    if (element.onclick) {
         return;
     }
 
-    element.setAttribute(turboVisitAttribute, "");
-    element.addEventListener("click", () => Turbo.visit(path));
+    element.onclick = () => Turbo.visit(path);
 }
