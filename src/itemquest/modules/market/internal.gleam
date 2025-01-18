@@ -4,7 +4,8 @@ import gleam/result
 import gleam/string
 import gleam/uri
 import itemquest/modules/market/sql.{
-  type SelectMarketItemRow, type SelectMarketItemsRow, type SelectMarketRow,
+  type SelectItemPricesRow, type SelectMarketItemRow, type SelectMarketItemsRow,
+  type SelectMarketRow,
 }
 import itemquest/web/contexts.{type RequestContext}
 import itemquest/web/errors.{type InternalError}
@@ -32,15 +33,19 @@ pub fn select_market(
   }
 }
 
-pub const sort_by_touples = [
-  #("price", SortByPrice), #("quantity", SortByQuantity),
-  #("popularity", SortByPopularity),
-]
-
 pub type MarketSortBy {
   SortByPrice
   SortByQuantity
   SortByPopularity
+}
+
+pub fn sort_by_from_string(sort_by: String) -> Result(MarketSortBy, Nil) {
+  case sort_by {
+    "price" -> Ok(SortByPrice)
+    "quantity" -> Ok(SortByQuantity)
+    "popularity" -> Ok(SortByPopularity)
+    _ -> Error(Nil)
+  }
 }
 
 pub fn sort_by_to_string(sort_by: MarketSortBy) -> String {
@@ -62,13 +67,19 @@ pub type MarketItemsFilter {
   )
 }
 
-pub const sort_direction_touples = [
-  #("asc", AscendingSort), #("desc", DescendingSort),
-]
-
 pub type SortDirection {
   AscendingSort
   DescendingSort
+}
+
+pub fn sort_direction_from_string(
+  sort_direction: String,
+) -> Result(SortDirection, Nil) {
+  case sort_direction {
+    "asc" -> Ok(AscendingSort)
+    "desc" -> Ok(DescendingSort)
+    _ -> Error(Nil)
+  }
 }
 
 pub fn sort_direction_to_string(sort_direction: SortDirection) -> String {
@@ -156,9 +167,14 @@ pub type GetMarketItemError {
 
 pub fn get_market_item(
   item_id: Int,
+  market_id: Int,
   ctx: RequestContext,
 ) -> Result(SelectMarketItemRow, InternalError(GetMarketItemError)) {
-  use _, rows <- errors.try_query(sql.select_market_item(ctx.db, item_id))
+  use _, rows <- errors.try_query(sql.select_market_item(
+    ctx.db,
+    item_id,
+    market_id,
+  ))
 
   case rows {
     [item, ..] -> Ok(item)
@@ -169,4 +185,39 @@ pub fn get_market_item(
       )
       |> Error
   }
+}
+
+pub type PricePeriod {
+  Day
+  Week
+  Month
+}
+
+pub fn price_period_from_string(period: String) -> Result(PricePeriod, Nil) {
+  case period {
+    "day" -> Ok(Day)
+    "week" -> Ok(Week)
+    "month" -> Ok(Month)
+    _ -> Error(Nil)
+  }
+}
+
+pub fn get_item_prices(
+  item_id: Int,
+  period: PricePeriod,
+  ctx: RequestContext,
+) -> Result(List(SelectItemPricesRow), InternalError(Nil)) {
+  let interval = case period {
+    Day -> "max"
+    Week -> "hour"
+    Month -> "day"
+  }
+
+  use _, rows <- errors.try_query(sql.select_item_prices(
+    ctx.db,
+    item_id,
+    interval,
+  ))
+
+  Ok(rows)
 }

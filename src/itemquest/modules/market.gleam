@@ -38,10 +38,11 @@ pub fn handle_get_market(
     )
 
   use market_id <- handling.require_int_string(market_id)
-  use sort_by <- handling.require_list_key(internal.sort_by_touples, sort_by)
-  use sort_direction <- handling.require_list_key(
-    internal.sort_direction_touples,
-    sort_direction,
+  use sort_by <- handling.require_ok_result(internal.sort_by_from_string(
+    sort_by,
+  ))
+  use sort_direction <- handling.require_ok_result(
+    internal.sort_direction_from_string(sort_direction),
   )
 
   use market <- require_market(market_id, ctx)
@@ -79,10 +80,11 @@ pub fn handle_get_market_items(
   let offset = handling.optional_list_key(query, "offset", "0")
 
   use market_id <- handling.require_int_string(market_id)
-  use sort_by <- handling.require_list_key(internal.sort_by_touples, sort_by)
-  use sort_direction <- handling.require_list_key(
-    internal.sort_direction_touples,
-    sort_direction,
+  use sort_by <- handling.require_ok_result(internal.sort_by_from_string(
+    sort_by,
+  ))
+  use sort_direction <- handling.require_ok_result(
+    internal.sort_direction_from_string(sort_direction),
   )
   use limit <- handling.require_int_string(limit)
   use offset <- handling.require_int_string(offset)
@@ -153,7 +155,7 @@ pub fn handle_get_market_item(
   use market_id <- handling.require_int_string(market_id)
   use item_id <- handling.require_int_string(item_id)
 
-  case internal.get_market_item(item_id, ctx) {
+  case internal.get_market_item(item_id, market_id, ctx) {
     Ok(item) ->
       item
       |> item_page.page
@@ -162,7 +164,32 @@ pub fn handle_get_market_item(
       |> wisp.html_response(200)
     Error(error) ->
       case error {
+        // todo - display not found content or handle this at a higher level
         errors.Business(_, internal.ItemNotFoundError) -> wisp.not_found()
+        _ -> wisp.internal_server_error()
+      }
+  }
+}
+
+pub fn handle_get_market_item_prices(
+  item_id: String,
+  req: Request,
+  ctx: RequestContext,
+) -> Response {
+  use <- wisp.require_method(req, http.Get)
+  let query = wisp.get_query(req)
+
+  use period <- handling.require_list_key(query, "period")
+  use period <- handling.require_ok_result(internal.price_period_from_string(
+    period,
+  ))
+
+  use item_id <- handling.require_int_string(item_id)
+
+  case internal.get_item_prices(item_id, period, ctx) {
+    Ok(prices) -> wisp.ok()
+    Error(error) ->
+      case error {
         _ -> wisp.internal_server_error()
       }
   }

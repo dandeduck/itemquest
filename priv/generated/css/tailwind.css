@@ -727,6 +727,10 @@ select {
   margin-bottom: 2.5rem;
 }
 
+.mb-2 {
+  margin-bottom: 0.5rem;
+}
+
 .mb-20 {
   margin-bottom: 5rem;
 }
@@ -759,6 +763,10 @@ select {
   height: 1rem;
 }
 
+.h-64 {
+  height: 16rem;
+}
+
 .w-0 {
   width: 0px;
 }
@@ -773,6 +781,10 @@ select {
 
 .w-4 {
   width: 1rem;
+}
+
+.w-64 {
+  width: 16rem;
 }
 
 .w-full {
@@ -810,6 +822,10 @@ select {
 
 .gap-10 {
   gap: 2.5rem;
+}
+
+.gap-12 {
+  gap: 3rem;
 }
 
 .gap-5 {

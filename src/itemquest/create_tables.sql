@@ -53,7 +53,7 @@ CREATE TABLE market_items (
 CREATE TABLE users (
     user_id   serial PRIMARY KEY,
     name      varchar(31) NOT NULL,
-    image_url varchar(255) NOT NULL
+    avatar_image_url varchar(255) NOT NULL
 );
 
 CREATE TABLE market_listings (
@@ -63,7 +63,7 @@ CREATE TABLE market_listings (
     user_id          serial REFERENCES users,
     listing_type     listing_type NOT NULL,
     price            integer NOT NULL CHECK (price > 3),
-    created_at       timestamp DEFAULT CURRENT_TIMESTAMP
+    created_at       timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE market_sales (
@@ -74,7 +74,7 @@ CREATE TABLE market_sales (
     from_user_id     serial REFERENCES users,
     to_user_id       serial REFERENCES users,
     price            integer NOT NULL CHECK (price > 0),
-    created_at       timestamp DEFAULT CURRENT_TIMESTAMP
+    time             timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE waitlist_emails (

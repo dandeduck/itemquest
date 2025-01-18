@@ -9,7 +9,12 @@ import pog
 /// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub type SelectMarketItemRow {
-  SelectMarketItemRow(name: String, image_url: String, price: Option(Int))
+  SelectMarketItemRow(
+    item_id: Int,
+    name: String,
+    image_url: String,
+    price: Option(Int),
+  )
 }
 
 /// Runs the `select_market_item` query
@@ -18,21 +23,23 @@ pub type SelectMarketItemRow {
 /// > 🐿️ This function was generated automatically using v2.0.5 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
-pub fn select_market_item(db, arg_1) {
+pub fn select_market_item(db, arg_1, arg_2) {
   let decoder = {
-    use name <- zero.field(0, zero.string)
-    use image_url <- zero.field(1, zero.string)
-    use price <- zero.field(2, zero.optional(zero.int))
-    zero.success(SelectMarketItemRow(name:, image_url:, price:))
+    use item_id <- zero.field(0, zero.int)
+    use name <- zero.field(1, zero.string)
+    use image_url <- zero.field(2, zero.string)
+    use price <- zero.field(3, zero.optional(zero.int))
+    zero.success(SelectMarketItemRow(item_id:, name:, image_url:, price:))
   }
 
-  let query = "SELECT name, image_url, price
+  let query = "SELECT item_id, name, image_url, price
 FROM market_items
-WHERE item_id = $1;
+WHERE item_id = $1 AND market_id = $2;
 "
 
   pog.query(query)
   |> pog.parameter(pog.int(arg_1))
+  |> pog.parameter(pog.int(arg_2))
   |> pog.returning(zero.run(_, decoder))
   |> pog.execute(db)
 }
@@ -215,6 +222,50 @@ LIMIT $5 OFFSET $6;
   |> pog.parameter(pog.text(arg_4))
   |> pog.parameter(pog.int(arg_5))
   |> pog.parameter(pog.int(arg_6))
+  |> pog.returning(zero.run(_, decoder))
+  |> pog.execute(db)
+}
+
+/// A row you get from running the `select_item_prices` query
+/// defined in `./src/itemquest/modules/market/sql/select_item_prices.sql`.
+///
+/// > 🐿️ This type definition was generated automatically using v2.0.5 of the
+/// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub type SelectItemPricesRow {
+  SelectItemPricesRow(price: Int, time: pog.Timestamp)
+}
+
+/// Interval can be 'max', 'hour', 'day'. Based on this runs on the relevant view/table
+///
+/// > 🐿️ This function was generated automatically using v2.0.5 of
+/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub fn select_item_prices(db, arg_1, arg_2) {
+  let decoder = {
+    use price <- zero.field(0, zero.int)
+    use time <- zero.field(1, timestamp_decoder())
+    zero.success(SelectItemPricesRow(price:, time:))
+  }
+
+  let query = "-- Interval can be 'max', 'hour', 'day'. Based on this runs on the relevant view/table
+SELECT price, time
+FROM market_sales
+WHERE $2 = 'max' AND item_id = $1 AND time >= NOW() - INTERVAL '1 day'
+UNION ALL 
+SELECT price, time
+FROM hourly_item_prices
+WHERE $2 = 'hour' AND item_id = $1
+UNION ALL  
+SELECT price, time
+FROM daily_item_prices
+WHERE $2 = 'day' AND item_id = $1;
+
+"
+
+  pog.query(query)
+  |> pog.parameter(pog.int(arg_1))
+  |> pog.parameter(pog.text(arg_2))
   |> pog.returning(zero.run(_, decoder))
   |> pog.execute(db)
 }
