@@ -14,6 +14,7 @@ pub fn layout(page: Element(t)) -> Element(t) {
         attribute.name("view-transition"),
         attribute.content("same-origin"),
       ]),
+      html.meta([ attribute.name("turbo-refresh-scroll"), attribute.content("preserve")]),
       icons(),
       tailwind(),
       css(),

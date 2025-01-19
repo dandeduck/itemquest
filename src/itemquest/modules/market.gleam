@@ -1,8 +1,6 @@
 import gleam/http
 import gleam/list
-import gleam/option
-import gleam/uri
-import itemquest/modules/market/internal
+import itemquest/modules/market/internal.{type MarketItemsFilter}
 import itemquest/modules/market/sql.{type SelectMarketRow}
 import itemquest/modules/market/ui/item_page
 import itemquest/modules/market/ui/market_page
@@ -21,33 +19,11 @@ pub fn handle_get_market(
   use <- wisp.require_method(req, http.Get)
 
   let query = wisp.get_query(req)
-  let search = list.key_find(query, "search")
-  let sort_by = handling.optional_list_key(query, "sort_by", "quantity")
-  let sort_direction =
-    handling.optional_list_key(query, "sort_direction", "desc")
+  use filter <- parse_market_query(query, market_id)
 
-  let market_items_uri =
-    uri.Uri(
-      option.None,
-      option.None,
-      option.None,
-      option.None,
-      "/markets/" <> market_id <> "/items",
-      req.query,
-      option.None,
-    )
+  use market <- require_market(filter.market_id, ctx)
 
-  use market_id <- handling.require_int_string(market_id)
-  use sort_by <- handling.require_ok_result(internal.sort_by_from_string(
-    sort_by,
-  ))
-  use sort_direction <- handling.require_ok_result(
-    internal.sort_direction_from_string(sort_direction),
-  )
-
-  use market <- require_market(market_id, ctx)
-
-  market_page.page(market, market_items_uri, sort_by, sort_direction, search)
+  market_page.page(market, filter)
   |> layout.layout
   |> element.to_document_string_builder
   |> wisp.html_response(200)
@@ -72,6 +48,27 @@ pub fn handle_get_market_items(
 ) -> Response {
   use <- wisp.require_method(req, http.Get)
   let query = wisp.get_query(req)
+  use filter <- parse_market_query(query, market_id)
+
+  case internal.get_market_items(filter, ctx) {
+    Ok(items) ->
+      case items {
+        [] -> wisp.no_content()
+        _ ->
+          market_page.market_rows_stream(filter, items)
+          |> element.to_document_string_builder
+          |> handling.turbo_stream_html_response(200)
+      }
+    // todo: show error instead
+    Error(_) -> wisp.internal_server_error()
+  }
+}
+
+pub fn parse_market_query(
+  query: List(#(String, String)),
+  market_id: String,
+  handle_filter: fn(MarketItemsFilter) -> Response,
+) -> Response {
   let search = list.key_find(query, "search")
   let sort_by = handling.optional_list_key(query, "sort_by", "quantity")
   let sort_direction =
@@ -89,30 +86,14 @@ pub fn handle_get_market_items(
   use limit <- handling.require_int_string(limit)
   use offset <- handling.require_int_string(offset)
 
-  case
-    internal.get_market_items(
-      internal.MarketItemsFilter(
-        market_id:,
-        search:,
-        sort_by:,
-        sort_direction:,
-        limit:,
-        offset:,
-      ),
-      ctx,
-    )
-  {
-    Ok(items) ->
-      case items {
-        [] -> wisp.no_content()
-        _ ->
-          market_page.market_rows_stream(market_id, items)
-          |> element.to_document_string_builder
-          |> handling.turbo_stream_html_response(200)
-      }
-    // todo: show error instead
-    Error(_) -> wisp.internal_server_error()
-  }
+  handle_filter(internal.MarketItemsFilter(
+    market_id:,
+    sort_by:,
+    sort_direction:,
+    search:,
+    limit:,
+    offset:,
+  ))
 }
 
 pub fn handle_get_market_items_search(
@@ -180,7 +161,7 @@ pub fn handle_get_market_item_prices(
   use <- wisp.require_method(req, http.Get)
   let query = wisp.get_query(req)
 
-  let period =  handling.optional_list_key(query, "period", "day")
+  let period = handling.optional_list_key(query, "period", "day")
   use period <- handling.require_ok_result(internal.price_period_from_string(
     period,
   ))

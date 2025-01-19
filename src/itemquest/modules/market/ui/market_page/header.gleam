@@ -1,6 +1,7 @@
+import gleam/int
 import gleam/list
 import gleam/result
-import itemquest/modules/market/internal.{type MarketSortBy, type SortDirection}
+import itemquest/modules/market/internal.{type MarketItemsFilter}
 import itemquest/modules/market/sql.{type SelectMarketRow}
 import itemquest/utils/ui
 import lustre/attribute
@@ -9,17 +10,12 @@ import lustre/element/html
 
 const search_results_container_id = "search_results_container"
 
-pub fn html(
-  market: SelectMarketRow,
-  sort_by: MarketSortBy,
-  sort_direction: SortDirection,
-  search: Result(String, Nil),
-) -> Element(t) {
+pub fn html(market: SelectMarketRow, filter: MarketItemsFilter) -> Element(t) {
   html.header([attribute.class("mb-20")], [
     html.h1([attribute.class("color-black text-3xl mb-10")], [
       html.text(market.name),
     ]),
-    search_bar(sort_by, sort_direction, search),
+    search_bar(filter),
   ])
 }
 
@@ -33,24 +29,34 @@ fn search_result(name: String) -> Element(t) {
   html.div([], [html.text(name)])
 }
 
-fn search_bar(
-  sort_by: MarketSortBy,
-  sort_direction: SortDirection,
-  search: Result(String, Nil),
-) -> Element(a) {
+fn search_bar(filter: MarketItemsFilter) -> Element(a) {
   html.search([attribute.class("relative")], [
     search_script(),
     html.form([], [
       html.input([
         attribute.type_("hidden"),
         attribute.name("sort_by"),
-        sort_by |> internal.sort_by_to_string |> attribute.value,
+        filter.sort_by |> internal.sort_by_to_string |> attribute.value,
       ]),
       html.input([
         attribute.type_("hidden"),
         attribute.name("sort_direction"),
-        sort_direction
+        filter.sort_direction
           |> internal.sort_direction_to_string
+          |> attribute.value,
+      ]),
+      html.input([
+        attribute.type_("hidden"),
+        attribute.name("offset"),
+        filter.offset
+          |> int.to_string
+          |> attribute.value,
+      ]),
+      html.input([
+        attribute.type_("hidden"),
+        attribute.name("limit"),
+        filter.limit
+          |> int.to_string
           |> attribute.value,
       ]),
       html.input([
@@ -59,7 +65,7 @@ fn search_bar(
         attribute.placeholder("search"),
         attribute.autocomplete("off"),
         attribute.type_("search"),
-        attribute.value(result.unwrap(search, "")),
+        attribute.value(result.unwrap(filter.search, "")),
         attribute.class("w-full"),
       ]),
     ]),

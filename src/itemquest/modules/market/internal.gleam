@@ -89,18 +89,16 @@ pub fn sort_direction_to_string(sort_direction: SortDirection) -> String {
   }
 }
 
-pub fn get_market_query(
-  sort_by: MarketSortBy,
-  sort_direction: SortDirection,
-  search: Result(String, Nil),
-) -> String {
+pub fn get_market_query(filter: MarketItemsFilter) -> String {
   let query = [
-    #("sort_by", sort_by_to_string(sort_by)),
-    #("sort_direction", sort_direction_to_string(sort_direction)),
+    #("sort_by", sort_by_to_string(filter.sort_by)),
+    #("sort_direction", sort_direction_to_string(filter.sort_direction)),
+    #("offset", int.to_string(filter.offset)),
+    #("limit", int.to_string(filter.limit)),
   ]
 
   let search_addition =
-    handle_search(search, fn(search) { [#("search", search)] }, list.new)
+    handle_search(filter.search, fn(search) { [#("search", search)] }, list.new)
 
   "?"
   <> list.flatten([query, search_addition])
