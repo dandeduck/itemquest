@@ -172,6 +172,7 @@ pub fn handle_get_market_item(
 }
 
 pub fn handle_get_market_item_prices(
+  market_id: String,
   item_id: String,
   req: Request,
   ctx: RequestContext,
@@ -179,15 +180,24 @@ pub fn handle_get_market_item_prices(
   use <- wisp.require_method(req, http.Get)
   let query = wisp.get_query(req)
 
-  use period <- handling.require_list_key(query, "period")
+  let period =  handling.optional_list_key(query, "period", "day")
   use period <- handling.require_ok_result(internal.price_period_from_string(
     period,
   ))
 
   use item_id <- handling.require_int_string(item_id)
+  use market_id <- handling.require_int_string(market_id)
+
+  // todo: do the two queries in parallel
+
+  let assert Ok(item) = internal.get_market_item(item_id, market_id, ctx)
 
   case internal.get_item_prices(item_id, period, ctx) {
-    Ok(prices) -> wisp.ok()
+    Ok(rows) ->
+      rows
+      |> item_page.prices(item)
+      |> element.to_document_string_builder
+      |> wisp.html_response(200)
     Error(error) ->
       case error {
         _ -> wisp.internal_server_error()

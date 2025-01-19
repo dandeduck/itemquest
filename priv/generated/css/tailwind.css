@@ -767,6 +767,10 @@ select {
   height: 16rem;
 }
 
+.h-full {
+  height: 100%;
+}
+
 .w-0 {
   width: 0px;
 }
@@ -789,6 +793,10 @@ select {
 
 .w-full {
   width: 100%;
+}
+
+.flex-1 {
+  flex: 1 1 0%;
 }
 
 .rotate-180 {

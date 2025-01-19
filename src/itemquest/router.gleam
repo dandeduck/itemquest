@@ -16,6 +16,8 @@ pub fn handle_request(req: Request, ctx: ServerContext) -> Response {
       market.handle_get_market_items_search(id, req, ctx)
     ["markets", market_id, "items", item_id] ->
       market.handle_get_market_item(market_id, item_id, req, ctx)
+    ["markets", market_id, "items", item_id, "prices"] ->
+      market.handle_get_market_item_prices(market_id, item_id, req, ctx)
     _ -> wisp.redirect("/")
     // todo: return 404 page
   }

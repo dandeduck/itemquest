@@ -58,7 +58,7 @@ fn charts_script() -> Element(t) {
   html.script(
     [
       attribute.src(
-        "https://cdn.jsdelivr.net/npm/chart.js@4.4/dist/chart.umd.min.js",
+        "https://cdn.jsdelivr.net/npm/echarts@5.6.0/dist/echarts.min.js",
       ),
     ],
     "",
@@ -76,7 +76,8 @@ fn import_map_script() -> Element(t) {
     " {
         \"imports\": {
             \"turbo\": \"https://unpkg.com/@hotwired/turbo@8.0.10/dist/turbo.es2017-esm.js\",
-            \"@itemquest/utils\": \"/public/js/utils.js\"
+            \"@itemquest/utils\": \"/public/js/utils.js\",
+            \"@itemquest/charts\": \"/public/js/charts.js\"
          }
       }",
   )

@@ -1,13 +1,13 @@
 -- Interval can be 'max', 'hour', 'day'. Based on this runs on the relevant view/table
-SELECT price, time
+SELECT price, extract(epoch from time)::int as timestamp
 FROM market_sales
-WHERE $2 = 'max' AND item_id = $1 AND time >= NOW() - INTERVAL '1 day'
+WHERE $2 = 'max' AND item_id = $1 AND time >= NOW() - INTERVAL '3 day'
 UNION ALL 
-SELECT price, time
+SELECT price, extract(epoch from time)::int as timestamp
 FROM hourly_item_prices
 WHERE $2 = 'hour' AND item_id = $1
 UNION ALL  
-SELECT price, time
+SELECT price, extract(epoch from time)::int as timestamp 
 FROM daily_item_prices
-WHERE $2 = 'day' AND item_id = $1;
-
+WHERE $2 = 'day' AND item_id = $1
+ORDER BY timestamp;
