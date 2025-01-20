@@ -3,7 +3,7 @@ import lustre/element.{type Element}
 import lustre/element/html
 
 pub fn layout(page: Element(t)) -> Element(t) {
-  html.html([], [
+  html.html([attribute.class("bg-bg-color text-font-color font-sans")], [
     html.head([], [
       html.title([], "itemquest"),
       html.meta([
@@ -14,10 +14,8 @@ pub fn layout(page: Element(t)) -> Element(t) {
         attribute.name("view-transition"),
         attribute.content("same-origin"),
       ]),
-      html.meta([ attribute.name("turbo-refresh-scroll"), attribute.content("preserve")]),
       icons(),
       tailwind(),
-      css(),
       charts_script(),
       import_map_script(),
       turbo_script(),
@@ -26,7 +24,7 @@ pub fn layout(page: Element(t)) -> Element(t) {
         "",
       ),
     ]),
-    html.body([attribute.class("text-black bg-white")], [header(), main(page)]),
+    html.body([], [header(), main(page)]),
   ])
 }
 
@@ -36,14 +34,6 @@ fn icons() -> Element(t) {
     attribute.href(
       "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0&icon_names=arrow_drop_down&display=block",
     ),
-  ])
-}
-
-fn css() -> Element(t) {
-  html.link([
-    attribute.rel("stylesheet"),
-    attribute.type_("text/css"),
-    attribute.href("/public/css/app.css"),
   ])
 }
 
@@ -89,7 +79,7 @@ fn main(page: Element(t)) -> Element(t) {
 }
 
 fn header() -> Element(t) {
-  html.header([attribute.class("bg-gray mb-20")], [
+  html.header([attribute.class("mb-20")], [
     html.div(
       [attribute.class("flex justify-between h-20 w-3/4 items-center mx-auto")],
       [

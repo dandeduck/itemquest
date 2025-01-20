@@ -12,7 +12,7 @@ const search_results_container_id = "search_results_container"
 
 pub fn html(market: SelectMarketRow, filter: MarketItemsFilter) -> Element(t) {
   html.header([attribute.class("mb-20")], [
-    html.h1([attribute.class("color-black text-3xl mb-10")], [
+    html.h1([attribute.class("text-3xl mb-10")], [
       html.text(market.name),
     ]),
     search_bar(filter),
@@ -72,7 +72,7 @@ fn search_bar(filter: MarketItemsFilter) -> Element(a) {
     html.div(
       [
         attribute.id(search_results_container_id),
-        attribute.class("absolute bg-gray w-full"),
+        attribute.class("absolute bg-secondary w-full"),
       ],
       [],
     ),

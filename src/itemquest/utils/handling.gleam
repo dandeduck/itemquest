@@ -19,8 +19,8 @@ pub fn require_ok_result(
   handle_request: fn(t) -> Response,
 ) -> Response {
   case result {
-      Ok(value) -> handle_request(value)
-      _ -> wisp.bad_request()
+    Ok(value) -> handle_request(value)
+    _ -> wisp.bad_request()
   }
 }
 

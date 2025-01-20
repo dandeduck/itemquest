@@ -32,7 +32,8 @@ pub fn select_market_item(db, arg_1, arg_2) {
     zero.success(SelectMarketItemRow(item_id:, name:, image_url:, price:))
   }
 
-  let query = "SELECT item_id, name, image_url, price
+  let query =
+    "SELECT item_id, name, image_url, price
 FROM market_items
 WHERE item_id = $1 AND market_id = $2;
 "
@@ -66,7 +67,8 @@ pub fn select_market_item_names(db, arg_1, arg_2) {
     zero.success(SelectMarketItemNamesRow(name:, rank:))
   }
 
-  let query = "
+  let query =
+    "
 -- Select market item names with (name)
 SELECT name, ts_rank(name_search, to_tsquery($2)) as rank
 FROM market_items 
@@ -104,7 +106,8 @@ pub fn select_hourly_item_prices(db, arg_1) {
     zero.success(SelectHourlyItemPricesRow(price:, time:))
   }
 
-  let query = "-- Selects all price+time rows by (item_id) using hourly_item_prices view
+  let query =
+    "-- Selects all price+time rows by (item_id) using hourly_item_prices view
 SELECT price, time
 FROM hourly_item_prices
 WHERE item_id = $1;
@@ -145,12 +148,17 @@ pub fn select_market(db, arg_1) {
     use name <- zero.field(2, zero.string)
     use image_url <- zero.field(3, zero.optional(zero.string))
     use created_at <- zero.field(4, zero.optional(timestamp_decoder()))
-    zero.success(
-      SelectMarketRow(market_id:, status:, name:, image_url:, created_at:),
-    )
+    zero.success(SelectMarketRow(
+      market_id:,
+      status:,
+      name:,
+      image_url:,
+      created_at:,
+    ))
   }
 
-  let query = "SELECT * FROM markets WHERE market_id = $1
+  let query =
+    "SELECT * FROM markets WHERE market_id = $1
 "
 
   pog.query(query)
@@ -189,19 +197,18 @@ pub fn select_market_items(db, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6) {
     use quantity <- zero.field(3, zero.int)
     use popularity <- zero.field(4, zero.int)
     use price <- zero.field(5, zero.optional(zero.int))
-    zero.success(
-      SelectMarketItemsRow(
-        item_id:,
-        name:,
-        image_url:,
-        quantity:,
-        popularity:,
-        price:,
-      ),
-    )
+    zero.success(SelectMarketItemsRow(
+      item_id:,
+      name:,
+      image_url:,
+      quantity:,
+      popularity:,
+      price:,
+    ))
   }
 
-  let query = "-- Select market items with (market_id, search, sort_by, sort_direction, limit, offset)
+  let query =
+    "-- Select market items with (market_id, search, sort_by, sort_direction, limit, offset)
 SELECT item_id, name, image_url, quantity, popularity, price
 FROM market_items 
 WHERE market_id = $1 AND CASE WHEN $2 != '' THEN name_search @@ to_tsquery($2) ELSE TRUE END
@@ -248,7 +255,8 @@ pub fn select_item_prices(db, arg_1, arg_2) {
     zero.success(SelectItemPricesRow(price:, timestamp:))
   }
 
-  let query = "-- Interval can be 'max', 'hour', 'day'. Based on this runs on the relevant view/table
+  let query =
+    "-- Interval can be 'max', 'hour', 'day'. Based on this runs on the relevant view/table
 SELECT price, extract(epoch from time)::int as timestamp
 FROM market_sales
 WHERE $2 = 'max' AND item_id = $1 AND time >= NOW() - INTERVAL '3 day'
@@ -292,7 +300,8 @@ pub fn select_daily_item_prices(db, arg_1) {
     zero.success(SelectDailyItemPricesRow(price:, time:))
   }
 
-  let query = "-- Selects all price+time rows by (item_id) using daily_item_prices view
+  let query =
+    "-- Selects all price+time rows by (item_id) using daily_item_prices view
 SELECT price, time
 FROM daily_item_prices
 WHERE item_id = $1;

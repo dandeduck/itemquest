@@ -20,7 +20,7 @@ pub fn html(filter: MarketItemsFilter) -> Element(t) {
         html.tr(
           [
             attribute.class(
-              "[&>*]:text-start [&>:not(:last-child)]:pr-10 [&>*]:border-b-8 [&>*]:border-white",
+              "[&>*]:text-start [&>:not(:last-child)]:pr-10 [&>*]:border-b-8 [&>*]:border-bg-color",
             ),
           ],
           [
@@ -52,7 +52,7 @@ pub fn html(filter: MarketItemsFilter) -> Element(t) {
         ),
       ]),
     ]),
-    load_more(filter)
+    load_more(filter),
   ])
 }
 
@@ -69,7 +69,7 @@ fn market_row(item: SelectMarketItemsRow, market_id: Int) -> Element(t) {
   html.tr(
     [
       attribute.class(
-        "[&>*]:text-start [&>:not(:last-child)]:pr-10 [&>*]:p-2 [&>*]:border-y-8 [&>*]:border-white bg-gray",
+        "[&>*]:text-start [&>:not(:last-child)]:pr-10 [&>*]:p-2 [&>*]:border-y-8 [&>*]:border-bg-color bg-secondary",
       ),
       ui.turbo_visit_attribute(
         int.to_string(market_id) <> "/items/" <> int.to_string(item.item_id),

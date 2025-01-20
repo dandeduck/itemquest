@@ -1,8 +1,8 @@
-import itemquest/utils/handling
-import itemquest/utils/ui/layout
 import gleam/http
 import itemquest/modules/waitlist/internal
 import itemquest/modules/waitlist/ui
+import itemquest/utils/handling
+import itemquest/utils/ui/layout
 import itemquest/web/contexts.{type RequestContext}
 import itemquest/web/errors
 import lustre/element

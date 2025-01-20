@@ -2,6 +2,47 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer base {
+    @font-face {
+        font-family: Bender;
+        font-style: normal;
+        font-weight: 400;
+        src: url(/public/fonts/bender.otf) format('opentype');
+    }
+
+    @font-face {
+        font-family: Bender;
+        font-weight: bold;
+        src: url(/public/fonts/bender_bold.otf) format('opentype');
+    }
+
+    @font-face {
+        font-family: Bender;
+        font-weight: 300;
+        src: url(/public/fonts/bender_light.otf) format('opentype');
+    }
+
+    @font-face {
+        font-family: Bender;
+        font-style: italic;
+        src: url(/public/fonts/bender_italic.otf) format('opentype');
+    }
+}
+
 [data-turbo-visit] {
     cursor: pointer;
+}
+
+:root {
+    --primary: #8B5CF6;
+    --primary-sat: #7C3AED;
+    --font-color: #051926;
+    --bg-color: #E7E5E4;
+    --success: #10B981;
+    --secondary: #A8A29E;
+}
+
+.dark {
+    --font-color: #E7E5E4;
+    --bg-color: #051926;
 }

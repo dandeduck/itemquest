@@ -1,9 +1,9 @@
-import gleam/option
 import gleam/erlang
 import gleam/float
 import gleam/int
 import gleam/io
 import gleam/list
+import gleam/option
 import gleam/string
 import itemquest/modules/market/sql.{
   type SelectItemPricesRow, type SelectMarketItemRow,
@@ -19,7 +19,7 @@ pub fn page(item: SelectMarketItemRow) -> Element(a) {
   html.section([], [
     html.header([attribute.class("mb-20 flex gap-12")], [
       html.div([], [
-        html.h1([attribute.class("color-black text-3xl mb-2")], [
+        html.h1([attribute.class("text-3xl mb-2")], [
           html.text(item.name),
         ]),
         html.img([attribute.class("w-64 h-64"), attribute.src(item.image_url)]),
@@ -46,18 +46,19 @@ pub fn prices(
       <> "]}"
     })
   let time = erlang.system_time(erlang.Millisecond)
-  let assert option.Some(item_price) = item.price
+  let cuurent_price_segment = case item.price {
+    option.Some(price) ->
+      ",{value:["
+      <> int.to_string(time)
+      <> ","
+      <> float.to_string(int.to_float(price) /. 100.0)
+      <> "]}"
+    _ -> ""
+  }
   let js_data =
-    "["
-    <> string.join(js_values, ",")
-    <> ",{value:["
-    <> int.to_string(time)
-    <> ","
-    <> float.to_string(int.to_float(item_price) /. 100.0)
-    <> "]}"
-    <> "]"
-  let js_string = 
-  "
+    "[" <> string.join(js_values, ",") <> cuurent_price_segment <> "]"
+  let js_string =
+    "
   import charts from '@itemquest/charts'
 
   charts.initTimeChart('prices_chart', %data%)

@@ -4,13 +4,16 @@
 module.exports = {
     content: ["./src/**/*.{html,gleam}"],
     theme: {
-        extend: {
-            colors: {
-                red: "#F44545",
-                gray: "#BEB2A9",
-                white: "#E2DED0",
-                black: "#1C343F",
-            },
+        colors: {
+            primary: "var(--primary)",
+            "primary-sat": "var(--primary-sat)",
+            "font-color": "var(--font-color)",
+            "bg-color": "var(--bg-color)",
+            success: "var(--success)",
+            secondary: "var(--secondary)",
+        },
+        fontFamily: {
+            sans: ["Bender"],
         },
     },
     plugins: [require("@tailwindcss/forms")],

@@ -1,5 +1,6 @@
 function initTimeChart(elementId, data) {
     const chartDom = document.getElementById(elementId);
+    const style = window.getComputedStyle(chartDom);
     const chart = echarts.init(chartDom);
 
     const option = {
@@ -50,10 +51,10 @@ function initTimeChart(elementId, data) {
         series: [
             {
                 lineStyle: {
-                    color: "red",
+                    color: style.getPropertyValue('--primary'),
                 },
                 itemStyle: {
-                    color: "red",
+                    color: style.getPropertyValue('--primary'),
                 },
                 data,
                 type: "line",

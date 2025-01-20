@@ -23,7 +23,8 @@ pub fn insert_item(db, arg_1, arg_2) {
     zero.success(InsertItemRow(item_id:))
   }
 
-  let query = "INSERT INTO items (market_id, name) VALUES ($1, $2) RETURNING item_id
+  let query =
+    "INSERT INTO items (market_id, name) VALUES ($1, $2) RETURNING item_id
 "
 
   pog.query(query)

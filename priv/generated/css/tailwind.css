@@ -46,7 +46,7 @@ html,
   -o-tab-size: 4;
      tab-size: 4;
   /* 3 */
-  font-family: ui-sans-serif, system-ui, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+  font-family: Bender;
   /* 4 */
   font-feature-settings: normal;
   /* 5 */
@@ -610,6 +610,40 @@ select {
   outline: 1px auto -webkit-focus-ring-color;
 }
 
+@font-face {
+  font-family: Bender;
+
+  font-style: normal;
+
+  font-weight: 400;
+
+  src: url(/public/fonts/bender.otf) format('opentype');
+}
+
+@font-face {
+  font-family: Bender;
+
+  font-weight: bold;
+
+  src: url(/public/fonts/bender_bold.otf) format('opentype');
+}
+
+@font-face {
+  font-family: Bender;
+
+  font-weight: 300;
+
+  src: url(/public/fonts/bender_light.otf) format('opentype');
+}
+
+@font-face {
+  font-family: Bender;
+
+  font-style: italic;
+
+  src: url(/public/fonts/bender_italic.otf) format('opentype');
+}
+
 *, ::before, ::after {
   --tw-border-spacing-x: 0;
   --tw-border-spacing-y: 0;
@@ -840,18 +874,20 @@ select {
   gap: 1.25rem;
 }
 
-.bg-gray {
-  --tw-bg-opacity: 1;
-  background-color: rgb(190 178 169 / var(--tw-bg-opacity));
+.bg-bg-color {
+  background-color: var(--bg-color);
 }
 
-.bg-white {
-  --tw-bg-opacity: 1;
-  background-color: rgb(226 222 208 / var(--tw-bg-opacity));
+.bg-secondary {
+  background-color: var(--secondary);
 }
 
 .pl-20 {
   padding-left: 5rem;
+}
+
+.font-sans {
+  font-family: Bender;
 }
 
 .text-2xl {
@@ -878,14 +914,8 @@ select {
   text-transform: uppercase;
 }
 
-.text-black {
-  --tw-text-opacity: 1;
-  color: rgb(28 52 63 / var(--tw-text-opacity));
-}
-
-.text-red {
-  --tw-text-opacity: 1;
-  color: rgb(244 69 69 / var(--tw-text-opacity));
+.text-font-color {
+  color: var(--font-color);
 }
 
 .opacity-100 {
@@ -904,6 +934,20 @@ select {
   cursor: pointer;
 }
 
+:root {
+  --primary: #8B5CF6;
+  --primary-sat: #7C3AED;
+  --font-color: #051926;
+  --bg-color: #E7E5E4;
+  --success: #10B981;
+  --secondary: #A8A29E;
+}
+
+.dark {
+  --font-color: #E7E5E4;
+  --bg-color: #051926;
+}
+
 .\[\&\>\*\]\:border-y-8>* {
   border-top-width: 8px;
   border-bottom-width: 8px;
@@ -913,9 +957,8 @@ select {
   border-bottom-width: 8px;
 }
 
-.\[\&\>\*\]\:border-white>* {
-  --tw-border-opacity: 1;
-  border-color: rgb(226 222 208 / var(--tw-border-opacity));
+.\[\&\>\*\]\:border-bg-color>* {
+  border-color: var(--bg-color);
 }
 
 .\[\&\>\*\]\:p-2>* {
