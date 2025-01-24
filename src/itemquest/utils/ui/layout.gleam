@@ -75,11 +75,11 @@ fn import_map_script() -> Element(t) {
 }
 
 fn main(page: Element(t)) -> Element(t) {
-  html.main([attribute.class("w-3/4 mx-auto")], [page])
+  html.main([attribute.class("mx-6 sm:mx-10 mb-20")], [page])
 }
 
 fn header() -> Element(t) {
-  html.header([attribute.class("mb-20")], [
+  html.header([attribute.class("mb-10")], [
     html.div(
       [attribute.class("flex justify-between h-20 w-3/4 items-center mx-auto")],
       [
