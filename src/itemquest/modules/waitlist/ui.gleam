@@ -28,9 +28,13 @@ pub fn page() -> Element(t) {
             attribute.name("email"),
             attribute.required(True),
             attribute.placeholder("e.g. item@quest.gg"),
+            attribute.class("px-3 py-1.5 rounded border-font-color"),
           ]),
           html.button(
-            [attribute.type_("submit"), attribute.class("bg-primary font-bold")],
+            [
+              attribute.type_("submit"),
+              attribute.class("bg-primary font-bold rounded px-3 py-2"),
+            ],
             [html.text("Join the waitlist")],
           ),
         ],
@@ -39,30 +43,62 @@ pub fn page() -> Element(t) {
     html.div(
       [
         attribute.class(
-          "flex flex-col md:flex-row gap-10 md:justify-between text-xl [&>*>h2]:text-primary [&>*>h2]:mb-5 [&>*>h2]:text-3xl [&>*>h2]:font-bold [&>*>div]:space-y-3",
+          "flex flex-col md:flex-row gap-10 md:justify-between text-xl",
         ),
+        attribute.class("[&>*>h2]:text-primary [&>*>h2]:mb-5 [&>*>h2]:text-3xl"),
+        attribute.class("[&>*>h2]:font-bold [&>*>div]:space-y-3"),
       ],
       [
         html.article([], [
           html.h2([], [html.text("Games")]),
           html.div([], [
-            html.p([], [
-              html.text("Items system and a marketplace free of charge"),
+            html.div([attribute.class("flex gap-2")], [
+              html.img([
+                attribute.src("/public/icons/storefront.svg"),
+                attribute.class("w-5 h-5 mt-[3px]"),
+              ]),
+              html.p([], [
+                html.text("Item system and a marketplace free of charge"),
+              ]),
             ]),
-            html.p([], [html.text("Earn comission on every transaction")]),
-            html.p([], [
-              html.text("View analytics and monitor statistics on your items"),
+            html.div([attribute.class("flex gap-2")], [
+              html.img([
+                attribute.src("/public/icons/coin.svg"),
+                attribute.class("w-5 h-5 mt-[3px]"),
+              ]),
+              html.p([], [html.text("Earn comission on every transaction")]),
+            ]),
+            html.div([attribute.class("flex gap-2")], [
+              html.img([
+                attribute.src("/public/icons/chart-line.svg"),
+                attribute.class("w-5 h-5 mt-[3px]"),
+              ]),
+              html.p([], [
+                html.text("View analytics and monitor statistics on your items"),
+              ]),
             ]),
           ]),
         ]),
         html.article([], [
           html.h2([], [html.text("Players")]),
           html.div([], [
-            html.p([], [
-              html.text("Withdraw real-world money from items you sold"),
+            html.div([attribute.class("flex gap-2")], [
+              html.img([
+                attribute.src("/public/icons/cash.svg"),
+                attribute.class("w-5 h-5 mt-[3px]"),
+              ]),
+              html.p([], [
+                html.text("Withdraw real-world money from items you sold"),
+              ]),
             ]),
-            html.p([], [
-              html.text("Trade freely between all games on the platform"),
+            html.div([attribute.class("flex gap-2")], [
+              html.img([
+                attribute.src("/public/icons/magic.svg"),
+                attribute.class("w-5 h-5 mt-[3px]"),
+              ]),
+              html.p([], [
+                html.text("Trade freely between all games on the platform"),
+              ]),
             ]),
           ]),
         ]),

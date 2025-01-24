@@ -34,6 +34,6 @@ squirrel = ">= 2.0.5 and < 3.0.0"
 [tailwind]
 args = [
     "--config=tailwind.config.js",
-    "--input=./priv/public/css/app.css",
+    "--input=./build.css",
     "--output=./priv/generated/css/tailwind.css"
 ]

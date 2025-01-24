@@ -3,7 +3,7 @@ import lustre/element.{type Element}
 import lustre/element/html
 
 pub fn layout(page: Element(t)) -> Element(t) {
-  html.html([attribute.class("bg-bg-color text-font-color font-sans")], [
+  html.html([attribute.class("bg-bg-color text-font-color")], [
     html.head([], [
       html.title([], "itemquest"),
       html.meta([
@@ -14,11 +14,23 @@ pub fn layout(page: Element(t)) -> Element(t) {
         attribute.name("view-transition"),
         attribute.content("same-origin"),
       ]),
+      html.meta([
+        attribute.name("turbo-refresh-scroll"),
+        attribute.content("preserve"),
+      ]),
       icons(),
       tailwind(),
       charts_script(),
       import_map_script(),
       turbo_script(),
+      html.script(
+        [attribute.type_("module")],
+        "
+      import themeManager from '@itemquest/themeManager'
+
+      themeManager.enableTheming();
+      ",
+      ),
       html.script(
         [attribute.type_("module"), attribute.src("/public/js/augments.js")],
         "",
@@ -68,7 +80,8 @@ fn import_map_script() -> Element(t) {
         \"imports\": {
             \"turbo\": \"https://unpkg.com/@hotwired/turbo@8.0.10/dist/turbo.es2017-esm.js\",
             \"@itemquest/utils\": \"/public/js/utils.js\",
-            \"@itemquest/charts\": \"/public/js/charts.js\"
+            \"@itemquest/charts\": \"/public/js/charts.js\",
+            \"@itemquest/themeManager\": \"/public/js/themeManager.js\"
          }
       }",
   )
@@ -79,16 +92,28 @@ fn main(page: Element(t)) -> Element(t) {
 }
 
 fn header() -> Element(t) {
-  html.header([attribute.class("mb-10")], [
-    html.div(
-      [attribute.class("flex justify-between h-20 w-3/4 items-center mx-auto")],
-      [
-        html.h1([attribute.class("text-2xl")], [html.text("logo")]),
-        html.div([attribute.class("flex gap-10")], [
-          html.h1([attribute.class("text-2xl")], [html.text("100$")]),
-          html.h1([attribute.class("text-2xl")], [html.text("profile")]),
+  html.header([attribute.class("p-6 mb-10")], [
+    html.div([attribute.class("flex justify-between items-center")], [
+      html.img([
+        attribute.src("/public/icons/logo-mini.svg"),
+        attribute.class("w-9"),
+      ]),
+      html.div([attribute.class("flex gap-5 [&>*]:w-6")], [
+        html.button([], [
+          html.img([
+            attribute.id("dark-theme"),
+            attribute.src("/public/icons/moon.svg"),
+            attribute.class("w-9"),
+          ]),
         ]),
-      ],
-    ),
+        html.button([], [
+          html.img([
+            attribute.id("light-theme"),
+            attribute.src("/public/icons/sun.svg"),
+            attribute.class("w-9"),
+          ]),
+        ]),
+      ]),
+    ]),
   ])
 }

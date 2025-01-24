@@ -15,6 +15,11 @@ pub fn middleware(
 
   use ctx <- create_context(req, server_ctx)
 
+  // todo: maybe accept a list here
+  // todo: move assets to Cloudflare to lighten up the deployment
+  use <- serve_cached(req, "/public/fonts")
+  use <- serve_cached(req, "/public/icons")
+
   use <- wisp.serve_static(
     req,
     under: "/generated",
@@ -31,6 +36,25 @@ pub fn middleware(
   use req <- wisp.handle_head(req)
 
   handle_request(req, ctx)
+}
+
+// todo: more sophisticated caching options
+fn serve_cached(
+  req: Request,
+  cache_path: String,
+  handle_request: fn() -> Response,
+) -> Response {
+  let res = handle_request()
+
+  case string.starts_with(req.path, cache_path) {
+    True ->
+      wisp.set_header(
+        res,
+        "Cache-Control",
+        "public, max-age=31536000, immutable",
+      )
+    _ -> res
+  }
 }
 
 fn log_request(
