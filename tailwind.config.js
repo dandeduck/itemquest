@@ -1,8 +1,9 @@
 // See the Tailwind configuration guide for advanced usage
 // https://tailwindcss.com/docs/configuration
 
-module.exports = {
+module.exports = { 
     content: ["./src/**/*.{html,gleam}"],
+    darkMode: ['variant'],
     theme: {
         colors: {
             primary: "var(--primary)",

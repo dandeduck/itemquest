@@ -5,7 +5,10 @@ import lustre/element/html
 
 pub fn page() -> Element(t) {
   html.section([], [
-    html.img([attribute.src("/public/icons/logo.svg"), attribute.class("h-9 mb-5")]),
+    html.img([
+      attribute.src("/public/icons/logo.svg"),
+      attribute.class("h-9 mb-5"),
+    ]),
     html.h1([attribute.class("text-3xl")], [
       html.text("A cross platform marketplace"),
       html.br([attribute.class("md:hidden")]),
@@ -23,12 +26,30 @@ pub fn page() -> Element(t) {
           html.h2([attribute.class("text-xl")], [
             html.text("Be one of the first games to join!"),
           ]),
-          html.input([
-            attribute.type_("email"),
-            attribute.name("email"),
-            attribute.required(True),
-            attribute.placeholder("e.g. item@quest.gg"),
-            attribute.class("px-3 py-1.5 rounded border-font-color"),
+          html.div([], [
+            html.label(
+              [attribute.class("text-sm mb-2 block"), attribute.for("email")],
+              [html.text("Email")],
+            ),
+            html.div([attribute.class("relative")], [
+              html.input([
+                attribute.id("email"),
+                attribute.type_("email"),
+                attribute.name("email"),
+                attribute.required(True),
+                attribute.placeholder("e.g. item@quest.gg"),
+                attribute.class("pe-3 ps-9 py-1.5 rounded border-font-color"),
+                attribute.class(
+                  "w-full bg-[transparent] placeholder:opacity-[0.6]",
+                ),
+              ]),
+              html.img([
+                attribute.src("/public/icons/email.svg"),
+                attribute.class(
+                  "w-4 absolute top-2 left-3 translate-y-1/2 dark:invert",
+                ),
+              ]),
+            ]),
           ]),
           html.button(
             [
