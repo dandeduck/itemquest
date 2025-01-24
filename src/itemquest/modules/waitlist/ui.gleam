@@ -5,7 +5,7 @@ import lustre/element/html
 
 pub fn page() -> Element(t) {
   html.section([], [
-    html.h1([attribute.class("text-4xl mb-5")], [html.text("itemQuest")]),
+    html.img([attribute.src("/public/icons/logo.svg"), attribute.class("h-9 mb-5")]),
     html.h1([attribute.class("text-3xl")], [
       html.text("A cross platform marketplace"),
       html.br([attribute.class("md:hidden")]),
