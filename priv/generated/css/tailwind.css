@@ -858,6 +858,10 @@ select {
   width: 100%;
 }
 
+.max-w-\[660px\] {
+  max-width: 660px;
+}
+
 .flex-1 {
   flex: 1 1 0%;
 }
@@ -1008,6 +1012,10 @@ select {
   opacity: 0.5;
 }
 
+.opacity-\[0\.6\] {
+  opacity: 0.6;
+}
+
 .filter {
   filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
 }
@@ -1059,6 +1067,27 @@ select {
   }
 }
 
+.dark\:block:where(.dark, .dark *) {
+  display: block;
+}
+
+.dark\:hidden:where(.dark, .dark *) {
+  display: none;
+}
+
+.dark\:opacity-100:where(.dark, .dark *) {
+  opacity: 1;
+}
+
+.dark\:opacity-\[0\.6\]:where(.dark, .dark *) {
+  opacity: 0.6;
+}
+
+.dark\:invert:where(.dark, .dark *) {
+  --tw-invert: invert(100%);
+  filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow);
+}
+
 .\[\&\>\*\>div\]\:space-y-3>*>div > :not([hidden]) ~ :not([hidden]) {
   --tw-space-y-reverse: 0;
   margin-top: calc(0.75rem * calc(1 - var(--tw-space-y-reverse)));
@@ -1105,6 +1134,12 @@ select {
 
 .\[\&\>\*\]\:text-start>* {
   text-align: start;
+}
+
+@media (min-width: 768px) {
+  .\[\&\>\*\]\:md\:w-\[660px\]>* {
+    width: 660px;
+  }
 }
 
 .\[\&\>\:not\(\:last-child\)\]\:pr-10>:not(:last-child) {

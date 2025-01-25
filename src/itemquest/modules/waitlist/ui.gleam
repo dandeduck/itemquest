@@ -6,8 +6,12 @@ import lustre/element/html
 pub fn page() -> Element(t) {
   html.section([], [
     html.img([
-      attribute.src("/public/icons/logo.svg"),
-      attribute.class("h-9 mb-5"),
+      attribute.src("/public/icons/logo-light.svg"),
+      attribute.class("h-9 mb-5 dark:hidden"),
+    ]),
+    html.img([
+      attribute.src("/public/icons/logo-dark.svg"),
+      attribute.class("h-9 mb-5 hidden dark:block"),
     ]),
     html.h1([attribute.class("text-3xl")], [
       html.text("A cross platform marketplace"),
@@ -20,7 +24,7 @@ pub fn page() -> Element(t) {
           attribute.enctype("multipart/form-data"),
           attribute.action("/waitlist"),
           attribute.method("post"),
-          attribute.class("flex flex-col gap-3 my-20"),
+          attribute.class("flex flex-col gap-3 my-20 max-w-[660px]"),
         ],
         [
           html.h2([attribute.class("text-xl")], [
@@ -36,6 +40,7 @@ pub fn page() -> Element(t) {
                 attribute.id("email"),
                 attribute.type_("email"),
                 attribute.name("email"),
+                attribute.autocomplete("email"),
                 attribute.required(True),
                 attribute.placeholder("e.g. item@quest.gg"),
                 attribute.class("pe-3 ps-9 py-1.5 rounded border-font-color"),
@@ -67,7 +72,7 @@ pub fn page() -> Element(t) {
           "flex flex-col md:flex-row gap-10 md:justify-between text-xl",
         ),
         attribute.class("[&>*>h2]:text-primary [&>*>h2]:mb-5 [&>*>h2]:text-3xl"),
-        attribute.class("[&>*>h2]:font-bold [&>*>div]:space-y-3"),
+        attribute.class("[&>*>h2]:font-bold [&>*>div]:space-y-3 [&>*]:md:w-[660px]"),
       ],
       [
         html.article([], [

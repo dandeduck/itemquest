@@ -3,7 +3,7 @@
 
 module.exports = { 
     content: ["./src/**/*.{html,gleam}"],
-    darkMode: ['variant'],
+    darkMode: 'selector',
     theme: {
         colors: {
             primary: "var(--primary)",

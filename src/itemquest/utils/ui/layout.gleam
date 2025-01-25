@@ -3,7 +3,7 @@ import lustre/element.{type Element}
 import lustre/element/html
 
 pub fn layout(page: Element(t)) -> Element(t) {
-  html.html([attribute.class("bg-bg-color text-font-color")], [
+  html.html([attribute.class("")], [
     html.head([], [
       html.title([], "itemquest"),
       html.meta([
@@ -23,20 +23,16 @@ pub fn layout(page: Element(t)) -> Element(t) {
       charts_script(),
       import_map_script(),
       turbo_script(),
-      html.script(
-        [attribute.type_("module")],
-        "
-      import themeManager from '@itemquest/themeManager'
-
-      themeManager.enableTheming();
-      ",
-      ),
+      html.script([attribute.src("/public/js/theme.js")], ""),
       html.script(
         [attribute.type_("module"), attribute.src("/public/js/augments.js")],
         "",
       ),
     ]),
-    html.body([], [header(), main(page)]),
+    html.body([attribute.class("bg-bg-color text-font-color")], [
+      header(),
+      main(page),
+    ]),
   ])
 }
 
@@ -99,18 +95,17 @@ fn header() -> Element(t) {
         attribute.class("w-9"),
       ]),
       html.div([attribute.class("flex gap-5 [&>*]:w-6")], [
-        html.button([], [
+        html.button([attribute.attribute("onclick", "setDarkTheme()")], [
           html.img([
             attribute.id("dark-theme"),
             attribute.src("/public/icons/moon.svg"),
-            attribute.class("w-9"),
+            attribute.class("w-9 dark:invert dark:opacity-[0.6]"),
           ]),
         ]),
-        html.button([], [
+        html.button([attribute.attribute("onclick", "setLightTheme()")], [
           html.img([
-            attribute.id("light-theme"),
             attribute.src("/public/icons/sun.svg"),
-            attribute.class("w-9"),
+            attribute.class("w-9 dark:invert opacity-[0.6] dark:opacity-100"),
           ]),
         ]),
       ]),
