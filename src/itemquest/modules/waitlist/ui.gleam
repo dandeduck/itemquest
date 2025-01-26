@@ -72,7 +72,9 @@ pub fn page() -> Element(t) {
           "flex flex-col md:flex-row gap-10 md:justify-between text-xl",
         ),
         attribute.class("[&>*>h2]:text-primary [&>*>h2]:mb-5 [&>*>h2]:text-3xl"),
-        attribute.class("[&>*>h2]:font-bold [&>*>div]:space-y-3 [&>*]:md:w-[660px]"),
+        attribute.class(
+          "[&>*>h2]:font-bold [&>*>div]:space-y-3 [&>*]:md:w-[660px]",
+        ),
       ],
       [
         html.article([], [

@@ -19,9 +19,7 @@ pub fn page(item: SelectMarketItemRow) -> Element(a) {
   html.section([], [
     html.header([attribute.class("mb-20 flex gap-12")], [
       html.div([], [
-        html.h1([attribute.class("text-3xl mb-2")], [
-          html.text(item.name),
-        ]),
+        html.h1([attribute.class("text-3xl mb-2")], [html.text(item.name)]),
         html.img([attribute.class("w-64 h-64"), attribute.src(item.image_url)]),
       ]),
       ui.eager_loading_frame(

@@ -1,0 +1,11 @@
+# flyctl launch added from .gitignore
+# gleam
+**/*.beam
+**/*.ez
+build
+**/erl_crash.dump
+
+# secrets
+**/.env
+**/.sqllsrc.json
+fly.toml

@@ -27,7 +27,9 @@ pub fn main() {
   let assert Ok(_) =
     wisp_mist.handler(router.handle_request(_, ctx), secret_key_base)
     |> mist.new
-    |> mist.port(8000)
+    |> mist.port(8080)
+    |> mist.bind("0.0.0.0")
+    |> mist.bind("127.0.0.1")
     |> mist.start_http
 
   process.sleep_forever()
