@@ -1,3 +1,5 @@
+import itemquest/utils/logging
+import itemquest/web/contexts.{type RequestContext}
 import pog.{type QueryError}
 
 pub type InternalError(t) {
@@ -7,12 +9,26 @@ pub type InternalError(t) {
 
 pub fn try_query(
   result: Result(pog.Returned(t), QueryError),
+  ctx: RequestContext,
   handle_returned: fn(Int, List(t)) -> Result(r, InternalError(e)),
 ) -> Result(r, InternalError(e)) {
   case result {
     Ok(pog.Returned(length, rows)) -> handle_returned(length, rows)
-    Error(error) -> error |> from_query_error |> Error
+    Error(error) ->
+      error |> from_query_error |> log_internal_error(ctx) |> Error
   }
+}
+
+pub fn log_internal_error(
+  error: InternalError(t),
+  ctx: RequestContext,
+) -> InternalError(t) {
+  case error {
+    Business(message, _) -> logging.log_warning("Business: " <> message, ctx)
+    Operational(message) -> logging.log_error("Operational: " <> message, ctx)
+  }
+
+  error
 }
 
 pub fn from_query_error(error: QueryError) -> InternalError(t) {

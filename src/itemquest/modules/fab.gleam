@@ -7,7 +7,7 @@ pub fn create_item(
   market_id: Int,
   name: String,
 ) -> Result(Int, InternalError(Nil)) {
-  use _, rows <- errors.try_query(sql.insert_item(ctx.db, market_id, name))
+  use _, rows <- errors.try_query(sql.insert_item(ctx.db, market_id, name), ctx)
   let assert [row] = rows
 
   Ok(row.item_id)

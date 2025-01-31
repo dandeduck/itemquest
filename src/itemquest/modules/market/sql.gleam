@@ -1,11 +1,11 @@
-import decode/zero
+import gleam/dynamic/decode
 import gleam/option.{type Option}
 import pog
 
 /// A row you get from running the `select_market_item` query
 /// defined in `./src/itemquest/modules/market/sql/select_market_item.sql`.
 ///
-/// > 🐿️ This type definition was generated automatically using v2.0.5 of the
+/// > 🐿️ This type definition was generated automatically using v3.0.0 of the
 /// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub type SelectMarketItemRow {
@@ -20,20 +20,19 @@ pub type SelectMarketItemRow {
 /// Runs the `select_market_item` query
 /// defined in `./src/itemquest/modules/market/sql/select_market_item.sql`.
 ///
-/// > 🐿️ This function was generated automatically using v2.0.5 of
+/// > 🐿️ This function was generated automatically using v3.0.0 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub fn select_market_item(db, arg_1, arg_2) {
   let decoder = {
-    use item_id <- zero.field(0, zero.int)
-    use name <- zero.field(1, zero.string)
-    use image_url <- zero.field(2, zero.string)
-    use price <- zero.field(3, zero.optional(zero.int))
-    zero.success(SelectMarketItemRow(item_id:, name:, image_url:, price:))
+    use item_id <- decode.field(0, decode.int)
+    use name <- decode.field(1, decode.string)
+    use image_url <- decode.field(2, decode.string)
+    use price <- decode.field(3, decode.optional(decode.int))
+    decode.success(SelectMarketItemRow(item_id:, name:, image_url:, price:))
   }
 
-  let query =
-    "SELECT item_id, name, image_url, price
+  let query = "SELECT item_id, name, image_url, price
 FROM market_items
 WHERE item_id = $1 AND market_id = $2;
 "
@@ -41,14 +40,14 @@ WHERE item_id = $1 AND market_id = $2;
   pog.query(query)
   |> pog.parameter(pog.int(arg_1))
   |> pog.parameter(pog.int(arg_2))
-  |> pog.returning(zero.run(_, decoder))
+  |> pog.returning(decoder)
   |> pog.execute(db)
 }
 
 /// A row you get from running the `select_market_item_names` query
 /// defined in `./src/itemquest/modules/market/sql/select_market_item_names.sql`.
 ///
-/// > 🐿️ This type definition was generated automatically using v2.0.5 of the
+/// > 🐿️ This type definition was generated automatically using v3.0.0 of the
 /// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub type SelectMarketItemNamesRow {
@@ -57,18 +56,17 @@ pub type SelectMarketItemNamesRow {
 
 /// Select market item names with (name)
 ///
-/// > 🐿️ This function was generated automatically using v2.0.5 of
+/// > 🐿️ This function was generated automatically using v3.0.0 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub fn select_market_item_names(db, arg_1, arg_2) {
   let decoder = {
-    use name <- zero.field(0, zero.string)
-    use rank <- zero.field(1, zero.float)
-    zero.success(SelectMarketItemNamesRow(name:, rank:))
+    use name <- decode.field(0, decode.string)
+    use rank <- decode.field(1, decode.float)
+    decode.success(SelectMarketItemNamesRow(name:, rank:))
   }
 
-  let query =
-    "
+  let query = "
 -- Select market item names with (name)
 SELECT name, ts_rank(name_search, to_tsquery($2)) as rank
 FROM market_items 
@@ -80,14 +78,14 @@ LIMIT 10;
   pog.query(query)
   |> pog.parameter(pog.int(arg_1))
   |> pog.parameter(pog.text(arg_2))
-  |> pog.returning(zero.run(_, decoder))
+  |> pog.returning(decoder)
   |> pog.execute(db)
 }
 
 /// A row you get from running the `select_hourly_item_prices` query
 /// defined in `./src/itemquest/modules/market/sql/select_hourly_item_prices.sql`.
 ///
-/// > 🐿️ This type definition was generated automatically using v2.0.5 of the
+/// > 🐿️ This type definition was generated automatically using v3.0.0 of the
 /// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub type SelectHourlyItemPricesRow {
@@ -96,18 +94,17 @@ pub type SelectHourlyItemPricesRow {
 
 /// Selects all price+time rows by (item_id) using hourly_item_prices view
 ///
-/// > 🐿️ This function was generated automatically using v2.0.5 of
+/// > 🐿️ This function was generated automatically using v3.0.0 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub fn select_hourly_item_prices(db, arg_1) {
   let decoder = {
-    use price <- zero.field(0, zero.optional(zero.int))
-    use time <- zero.field(1, zero.optional(timestamp_decoder()))
-    zero.success(SelectHourlyItemPricesRow(price:, time:))
+    use price <- decode.field(0, decode.optional(decode.int))
+    use time <- decode.field(1, decode.optional(pog.timestamp_decoder()))
+    decode.success(SelectHourlyItemPricesRow(price:, time:))
   }
 
-  let query =
-    "-- Selects all price+time rows by (item_id) using hourly_item_prices view
+  let query = "-- Selects all price+time rows by (item_id) using hourly_item_prices view
 SELECT price, time
 FROM hourly_item_prices
 WHERE item_id = $1;
@@ -115,14 +112,14 @@ WHERE item_id = $1;
 
   pog.query(query)
   |> pog.parameter(pog.int(arg_1))
-  |> pog.returning(zero.run(_, decoder))
+  |> pog.returning(decoder)
   |> pog.execute(db)
 }
 
 /// A row you get from running the `select_market` query
 /// defined in `./src/itemquest/modules/market/sql/select_market.sql`.
 ///
-/// > 🐿️ This type definition was generated automatically using v2.0.5 of the
+/// > 🐿️ This type definition was generated automatically using v3.0.0 of the
 /// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub type SelectMarketRow {
@@ -138,39 +135,34 @@ pub type SelectMarketRow {
 /// Runs the `select_market` query
 /// defined in `./src/itemquest/modules/market/sql/select_market.sql`.
 ///
-/// > 🐿️ This function was generated automatically using v2.0.5 of
+/// > 🐿️ This function was generated automatically using v3.0.0 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub fn select_market(db, arg_1) {
   let decoder = {
-    use market_id <- zero.field(0, zero.int)
-    use status <- zero.field(1, market_status_decoder())
-    use name <- zero.field(2, zero.string)
-    use image_url <- zero.field(3, zero.optional(zero.string))
-    use created_at <- zero.field(4, zero.optional(timestamp_decoder()))
-    zero.success(SelectMarketRow(
-      market_id:,
-      status:,
-      name:,
-      image_url:,
-      created_at:,
-    ))
+    use market_id <- decode.field(0, decode.int)
+    use status <- decode.field(1, market_status_decoder())
+    use name <- decode.field(2, decode.string)
+    use image_url <- decode.field(3, decode.optional(decode.string))
+    use created_at <- decode.field(4, decode.optional(pog.timestamp_decoder()))
+    decode.success(
+      SelectMarketRow(market_id:, status:, name:, image_url:, created_at:),
+    )
   }
 
-  let query =
-    "SELECT * FROM markets WHERE market_id = $1
+  let query = "SELECT * FROM markets WHERE market_id = $1
 "
 
   pog.query(query)
   |> pog.parameter(pog.int(arg_1))
-  |> pog.returning(zero.run(_, decoder))
+  |> pog.returning(decoder)
   |> pog.execute(db)
 }
 
 /// A row you get from running the `select_market_items` query
 /// defined in `./src/itemquest/modules/market/sql/select_market_items.sql`.
 ///
-/// > 🐿️ This type definition was generated automatically using v2.0.5 of the
+/// > 🐿️ This type definition was generated automatically using v3.0.0 of the
 /// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub type SelectMarketItemsRow {
@@ -186,29 +178,30 @@ pub type SelectMarketItemsRow {
 
 /// Select market items with (market_id, search, sort_by, sort_direction, limit, offset)
 ///
-/// > 🐿️ This function was generated automatically using v2.0.5 of
+/// > 🐿️ This function was generated automatically using v3.0.0 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub fn select_market_items(db, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6) {
   let decoder = {
-    use item_id <- zero.field(0, zero.int)
-    use name <- zero.field(1, zero.string)
-    use image_url <- zero.field(2, zero.string)
-    use quantity <- zero.field(3, zero.int)
-    use popularity <- zero.field(4, zero.int)
-    use price <- zero.field(5, zero.optional(zero.int))
-    zero.success(SelectMarketItemsRow(
-      item_id:,
-      name:,
-      image_url:,
-      quantity:,
-      popularity:,
-      price:,
-    ))
+    use item_id <- decode.field(0, decode.int)
+    use name <- decode.field(1, decode.string)
+    use image_url <- decode.field(2, decode.string)
+    use quantity <- decode.field(3, decode.int)
+    use popularity <- decode.field(4, decode.int)
+    use price <- decode.field(5, decode.optional(decode.int))
+    decode.success(
+      SelectMarketItemsRow(
+        item_id:,
+        name:,
+        image_url:,
+        quantity:,
+        popularity:,
+        price:,
+      ),
+    )
   }
 
-  let query =
-    "-- Select market items with (market_id, search, sort_by, sort_direction, limit, offset)
+  let query = "-- Select market items with (market_id, search, sort_by, sort_direction, limit, offset)
 SELECT item_id, name, image_url, quantity, popularity, price
 FROM market_items 
 WHERE market_id = $1 AND CASE WHEN $2 != '' THEN name_search @@ to_tsquery($2) ELSE TRUE END
@@ -229,14 +222,14 @@ LIMIT $5 OFFSET $6;
   |> pog.parameter(pog.text(arg_4))
   |> pog.parameter(pog.int(arg_5))
   |> pog.parameter(pog.int(arg_6))
-  |> pog.returning(zero.run(_, decoder))
+  |> pog.returning(decoder)
   |> pog.execute(db)
 }
 
 /// A row you get from running the `select_item_prices` query
 /// defined in `./src/itemquest/modules/market/sql/select_item_prices.sql`.
 ///
-/// > 🐿️ This type definition was generated automatically using v2.0.5 of the
+/// > 🐿️ This type definition was generated automatically using v3.0.0 of the
 /// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub type SelectItemPricesRow {
@@ -245,18 +238,17 @@ pub type SelectItemPricesRow {
 
 /// Interval can be 'max', 'hour', 'day'. Based on this runs on the relevant view/table
 ///
-/// > 🐿️ This function was generated automatically using v2.0.5 of
+/// > 🐿️ This function was generated automatically using v3.0.0 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub fn select_item_prices(db, arg_1, arg_2) {
   let decoder = {
-    use price <- zero.field(0, zero.int)
-    use timestamp <- zero.field(1, zero.int)
-    zero.success(SelectItemPricesRow(price:, timestamp:))
+    use price <- decode.field(0, decode.int)
+    use timestamp <- decode.field(1, decode.int)
+    decode.success(SelectItemPricesRow(price:, timestamp:))
   }
 
-  let query =
-    "-- Interval can be 'max', 'hour', 'day'. Based on this runs on the relevant view/table
+  let query = "-- Interval can be 'max', 'hour', 'day'. Based on this runs on the relevant view/table
 SELECT price, extract(epoch from time)::int as timestamp
 FROM market_sales
 WHERE $2 = 'max' AND item_id = $1 AND time >= NOW() - INTERVAL '3 day'
@@ -274,14 +266,14 @@ ORDER BY timestamp;
   pog.query(query)
   |> pog.parameter(pog.int(arg_1))
   |> pog.parameter(pog.text(arg_2))
-  |> pog.returning(zero.run(_, decoder))
+  |> pog.returning(decoder)
   |> pog.execute(db)
 }
 
 /// A row you get from running the `select_daily_item_prices` query
 /// defined in `./src/itemquest/modules/market/sql/select_daily_item_prices.sql`.
 ///
-/// > 🐿️ This type definition was generated automatically using v2.0.5 of the
+/// > 🐿️ This type definition was generated automatically using v3.0.0 of the
 /// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub type SelectDailyItemPricesRow {
@@ -290,18 +282,17 @@ pub type SelectDailyItemPricesRow {
 
 /// Selects all price+time rows by (item_id) using daily_item_prices view
 ///
-/// > 🐿️ This function was generated automatically using v2.0.5 of
+/// > 🐿️ This function was generated automatically using v3.0.0 of
 /// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub fn select_daily_item_prices(db, arg_1) {
   let decoder = {
-    use price <- zero.field(0, zero.optional(zero.int))
-    use time <- zero.field(1, zero.optional(timestamp_decoder()))
-    zero.success(SelectDailyItemPricesRow(price:, time:))
+    use price <- decode.field(0, decode.optional(decode.int))
+    use time <- decode.field(1, decode.optional(pog.timestamp_decoder()))
+    decode.success(SelectDailyItemPricesRow(price:, time:))
   }
 
-  let query =
-    "-- Selects all price+time rows by (item_id) using daily_item_prices view
+  let query = "-- Selects all price+time rows by (item_id) using daily_item_prices view
 SELECT price, time
 FROM daily_item_prices
 WHERE item_id = $1;
@@ -309,7 +300,7 @@ WHERE item_id = $1;
 
   pog.query(query)
   |> pog.parameter(pog.int(arg_1))
-  |> pog.returning(zero.run(_, decoder))
+  |> pog.returning(decoder)
   |> pog.execute(db)
 }
 
@@ -317,7 +308,7 @@ WHERE item_id = $1;
 
 /// Corresponds to the Postgres `market_status` enum.
 ///
-/// > 🐿️ This type definition was generated automatically using v2.0.5 of the
+/// > 🐿️ This type definition was generated automatically using v3.0.0 of the
 /// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
 ///
 pub type MarketStatus {
@@ -326,26 +317,10 @@ pub type MarketStatus {
 }
 
 fn market_status_decoder() {
-  use variant <- zero.then(zero.string)
+  use variant <- decode.then(decode.string)
   case variant {
-    "development" -> zero.success(Development)
-    "live" -> zero.success(Live)
-    _ -> zero.failure(Development, "MarketStatus")
-  }
-}
-
-// --- Encoding/decoding utils -------------------------------------------------
-
-/// A decoder to decode `timestamp`s coming from a Postgres query.
-///
-fn timestamp_decoder() {
-  use dynamic <- zero.then(zero.dynamic)
-  case pog.decode_timestamp(dynamic) {
-    Ok(timestamp) -> zero.success(timestamp)
-    Error(_) -> {
-      let date = pog.Date(0, 0, 0)
-      let time = pog.Time(0, 0, 0, 0)
-      zero.failure(pog.Timestamp(date:, time:), "timestamp")
-    }
+    "development" -> decode.success(Development)
+    "live" -> decode.success(Live)
+    _ -> decode.failure(Development, "MarketStatus")
   }
 }

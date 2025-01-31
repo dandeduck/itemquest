@@ -25,7 +25,7 @@ pub fn select_market(
   market_id: Int,
   ctx: RequestContext,
 ) -> Result(SelectMarketRow, InternalError(SelectMarketError)) {
-  use _, rows <- errors.try_query(sql.select_market(ctx.db, market_id))
+  use _, rows <- errors.try_query(sql.select_market(ctx.db, market_id), ctx)
 
   case rows {
     [market] -> Ok(market)
@@ -111,15 +111,18 @@ pub fn get_market_items(
 ) -> Result(List(SelectMarketItemsRow), InternalError(Nil)) {
   let search = handle_search(filter.search, name_query, fn() { "" })
 
-  use _, rows <- errors.try_query(sql.select_market_items(
-    ctx.db,
-    filter.market_id,
-    search,
-    filter.sort_by |> sort_by_to_string,
-    filter.sort_direction |> sort_direction_to_string |> string.uppercase,
-    filter.limit,
-    filter.offset,
-  ))
+  use _, rows <- errors.try_query(
+    sql.select_market_items(
+      ctx.db,
+      filter.market_id,
+      search,
+      filter.sort_by |> sort_by_to_string,
+      filter.sort_direction |> sort_direction_to_string |> string.uppercase,
+      filter.limit,
+      filter.offset,
+    ),
+    ctx,
+  )
 
   Ok(rows)
 }
@@ -143,11 +146,10 @@ pub fn search_market_item_names(
   search: String,
   ctx: RequestContext,
 ) -> Result(List(String), InternalError(Nil)) {
-  use _, rows <- errors.try_query(sql.select_market_item_names(
-    ctx.db,
-    market_id,
-    name_query(search),
-  ))
+  use _, rows <- errors.try_query(
+    sql.select_market_item_names(ctx.db, market_id, name_query(search)),
+    ctx,
+  )
 
   rows
   |> list.map(fn(row) { row.name })
@@ -168,11 +170,10 @@ pub fn get_market_item(
   market_id: Int,
   ctx: RequestContext,
 ) -> Result(SelectMarketItemRow, InternalError(GetMarketItemError)) {
-  use _, rows <- errors.try_query(sql.select_market_item(
-    ctx.db,
-    item_id,
-    market_id,
-  ))
+  use _, rows <- errors.try_query(
+    sql.select_market_item(ctx.db, item_id, market_id),
+    ctx,
+  )
 
   case rows {
     [item, ..] -> Ok(item)
@@ -211,11 +212,10 @@ pub fn get_item_prices(
     Month -> "day"
   }
 
-  use _, rows <- errors.try_query(sql.select_item_prices(
-    ctx.db,
-    item_id,
-    interval,
-  ))
+  use _, rows <- errors.try_query(
+    sql.select_item_prices(ctx.db, item_id, interval),
+    ctx,
+  )
 
   Ok(rows)
 }
