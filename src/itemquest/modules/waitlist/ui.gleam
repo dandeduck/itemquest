@@ -28,7 +28,7 @@ pub fn page() -> Element(t) {
         ],
         [
           html.h2([attribute.class("text-xl")], [
-            html.text("Be one of the first games to join!"),
+            html.text("Be one of the first game(r)s to join!"),
           ]),
           html.div([], [
             html.label(

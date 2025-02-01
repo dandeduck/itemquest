@@ -64,8 +64,6 @@ fn log_request(
 ) -> Response {
   let response = handler()
   [
-    ctx.request_id,
-    " ",
     int.to_string(response.status),
     " ",
     string.uppercase(http.method_to_string(req.method)),

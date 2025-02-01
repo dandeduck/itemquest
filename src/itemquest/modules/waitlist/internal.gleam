@@ -13,18 +13,19 @@ const remove_plus_exp_string = "\\+.*?(?=@)"
 
 pub fn add_waitlist_email(
   ctx: RequestContext,
-  address: String,
+  email: String,
 ) -> Result(Nil, InternalError(WaitlistErrorCode)) {
   use remove_plus_exp <- result.try(regexp_from_string(remove_plus_exp_string))
-  let address = regexp.replace(remove_plus_exp, in: address, with: "")
+  let email = regexp.replace(remove_plus_exp, in: email, with: "")
 
-  case sql.insert_waitlist_email(ctx.db, address) {
+  case sql.insert_into_waitlist(ctx.db, email) {
     Ok(_) -> Ok(Nil)
     Error(error) -> {
       case error {
         pog.ConstraintViolated(_, _, _) ->
           EmailAlreadyAdded
           |> errors.Business("Email already added to the waitlist", _)
+          |> errors.log_internal_error(ctx)
           |> Error
         _ -> error |> errors.from_query_error |> Error
       }

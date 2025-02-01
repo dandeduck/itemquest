@@ -1,4 +1,4 @@
-DROP TABLE IF EXISTS   market_sales, market_listings, market_items, item_instances, items, waitlist_emails, markets, users;
+DROP TABLE IF EXISTS   market_sales, market_listings, market_items, item_instances, items, waitlist, markets, users;
 DROP TYPE IF EXISTS item_status, market_status;
 
 CREATE TYPE item_status AS enum (
@@ -77,7 +77,7 @@ CREATE TABLE market_sales (
     time             timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE waitlist_emails (
-    address    varchar(255) PRIMARY KEY,
+CREATE TABLE waitlist (
+    email      varchar(255) PRIMARY KEY,
     created_at timestamp DEFAULT CURRENT_TIMESTAMP
 );

@@ -1,7 +1,6 @@
 import dot_env
 import dot_env/env
 import gleam/erlang/process
-import gleam/io
 import gleam/result
 import itemquest/router
 import itemquest/web/contexts
@@ -24,7 +23,6 @@ pub fn main() {
   let assert Ok(db) = connect_db(db_url)
 
   let ctx = contexts.ServerContext(priv_directory(), db)
-  io.debug(db_url)
 
   let assert Ok(_) =
     wisp_mist.handler(router.handle_request(_, ctx), secret_key_base)
@@ -45,6 +43,7 @@ fn connect_db(url: String) -> Result(Connection, Nil) {
   use config <- result.try(pog.url_config(url))
 
   config
+  |> pog.ip_version(pog.Ipv6)
   |> pog.connect
   |> Ok
 }
