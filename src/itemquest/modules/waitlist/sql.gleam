@@ -10,7 +10,8 @@ import pog
 pub fn insert_into_waitlist(db, arg_1) {
   let decoder = decode.map(decode.dynamic, fn(_) { Nil })
 
-  let query = "INSERT INTO waitlist (email) VALUES ($1);
+  let query =
+    "INSERT INTO waitlist (email) VALUES ($1);
 "
 
   pog.query(query)

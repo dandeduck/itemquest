@@ -27,7 +27,11 @@ pub fn add_waitlist_email(
           |> errors.Business("Email already added to the waitlist", _)
           |> errors.log_internal_error(ctx)
           |> Error
-        _ -> error |> errors.from_query_error |> Error
+        _ ->
+          error
+          |> errors.from_query_error
+          |> errors.log_internal_error(ctx)
+          |> Error
       }
     }
   }
