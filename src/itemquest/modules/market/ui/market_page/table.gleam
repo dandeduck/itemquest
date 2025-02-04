@@ -12,8 +12,27 @@ import lustre/element/html
 
 const market_rows_container = "market_rows_container"
 
-pub fn html(filter: MarketItemsFilter, market_id: Int) -> Element(t) {
-  html.div([], [
+const table_id = "market_items_table"
+
+pub fn frame(filter: MarketItemsFilter) -> Element(t) {
+  ui.eager_loading_frame(
+    [attribute.id(table_id), attribute.target("_top")],
+    int.to_string(filter.market_id)
+      <> "/items-table"
+      <> internal.get_market_query(filter),
+  )
+}
+
+pub fn html(
+  filter: MarketItemsFilter,
+  items: List(SelectMarketItemsRow),
+  items_count: Int,
+) -> Element(t) {
+  let item_rows =
+    items
+    |> list.map(market_row(_, filter.market_id))
+
+  ui.turbo_frame([attribute.id(table_id), attribute.target("_top")], [
     html.div(
       [
         attribute.class("w-full flex flex-col gap-4 mb-5"),
@@ -31,13 +50,13 @@ pub fn html(filter: MarketItemsFilter, market_id: Int) -> Element(t) {
           sorting_header(internal.SortByPopularity, filter),
           sorting_header(internal.SortByPrice, filter),
         ]),
+        ..item_rows
       ],
     ),
-    load_more(filter),
-    ui.eager_loading_frame(
-      [ui.turbo_stream_attribute()],
-      int.to_string(market_id) <> "/items",
-    ),
+    case items_count {
+      c if c == filter.limit -> load_more(filter)
+      _ -> html.div([], [])
+    },
   ])
 }
 

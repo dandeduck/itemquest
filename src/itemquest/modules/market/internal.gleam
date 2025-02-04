@@ -108,10 +108,10 @@ pub fn get_market_query(filter: MarketItemsFilter) -> String {
 pub fn get_market_items(
   filter: MarketItemsFilter,
   ctx: RequestContext,
-) -> Result(List(SelectMarketItemsRow), InternalError(Nil)) {
+) -> Result(#(Int, List(SelectMarketItemsRow)), InternalError(Nil)) {
   let search = handle_search(filter.search, name_query, fn() { "" })
 
-  use _, rows <- errors.try_query(
+  use count, rows <- errors.try_query(
     sql.select_market_items(
       ctx.db,
       filter.market_id,
@@ -124,7 +124,7 @@ pub fn get_market_items(
     ctx,
   )
 
-  Ok(rows)
+  Ok(#(count, rows))
 }
 
 fn handle_search(

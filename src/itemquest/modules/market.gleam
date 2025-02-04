@@ -43,6 +43,29 @@ fn require_market(
   }
 }
 
+pub fn handle_get_market_items_table(
+  market_id: String,
+  req: Request,
+  ctx: RequestContext,
+) -> Response {
+  use <- wisp.require_method(req, http.Get)
+  let query = wisp.get_query(req)
+  use filter <- parse_market_query(query, market_id)
+
+  case internal.get_market_items(filter, ctx) {
+    Ok(#(count, items)) ->
+      case items {
+        [] -> wisp.no_content()
+        _ ->
+          market_page.market_items_table(filter, items, count)
+          |> element.to_document_string_builder
+          |> wisp.html_response(200)
+      }
+    // todo: show error instead
+    Error(_) -> wisp.internal_server_error()
+  }
+}
+
 pub fn handle_get_market_items(
   market_id: String,
   req: Request,
@@ -53,7 +76,7 @@ pub fn handle_get_market_items(
   use filter <- parse_market_query(query, market_id)
 
   case internal.get_market_items(filter, ctx) {
-    Ok(items) ->
+    Ok(#(_, items)) ->
       case items {
         [] -> wisp.no_content()
         _ ->

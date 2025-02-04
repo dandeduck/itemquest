@@ -11,6 +11,8 @@ pub fn handle_request(req: Request, ctx: ServerContext) -> Response {
     [] -> waitlist.handle_get_waitlist(req)
     ["waitlist"] -> waitlist.handle_post_waitlist(req, ctx)
     ["markets", id] -> market.handle_get_market(id, req, ctx)
+    ["markets", id, "items-table"] ->
+      market.handle_get_market_items_table(id, req, ctx)
     ["markets", id, "items"] -> market.handle_get_market_items(id, req, ctx)
     ["markets", id, "items", "search"] ->
       market.handle_get_market_items_search(id, req, ctx)
