@@ -31,6 +31,10 @@ pub type TurboStreamAction {
   StreamRefresh
 }
 
+pub fn turbo_stream_attribute() -> Attribute(t) {
+  attribute.attribute("data-turbo-stream", "true")
+}
+
 pub fn turbo_stream(
   action: TurboStreamAction,
   target: String,
@@ -69,10 +73,6 @@ pub fn icon(name: String, class: Option(String)) -> Element(t) {
   )
 }
 
-pub fn turbo_visit_attribute(path: String) -> Attribute(t) {
-  attribute.attribute("data-turbo-visit", path)
-}
-
 pub fn get_string_price(price: Int) -> String {
-    float.to_string(int.to_float(price) /. 100.0)
+  float.to_string(int.to_float(price) /. 100.0)
 }

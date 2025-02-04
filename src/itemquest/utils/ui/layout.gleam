@@ -24,10 +24,6 @@ pub fn layout(page: Element(t)) -> Element(t) {
       import_map_script(),
       turbo_script(),
       html.script([attribute.src("/public/js/theme.js")], ""),
-      html.script(
-        [attribute.type_("module"), attribute.src("/public/js/augments.js")],
-        "",
-      ),
     ]),
     html.body([attribute.class("bg-bg-color text-font-color")], [
       header(),

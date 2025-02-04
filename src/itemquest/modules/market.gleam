@@ -1,5 +1,7 @@
+import gleam/erlang
 import gleam/http
 import gleam/list
+import gleam/option
 import itemquest/modules/market/internal.{type MarketItemsFilter}
 import itemquest/modules/market/sql.{type SelectMarketRow}
 import itemquest/modules/market/ui/item_page
@@ -174,14 +176,43 @@ pub fn handle_get_market_item_prices(
   let assert Ok(item) = internal.get_market_item(item_id, market_id, ctx)
 
   case internal.get_item_prices(item_id, period, ctx) {
-    Ok(rows) ->
+    Ok(rows) -> {
+      let time = erlang.system_time(erlang.Second)
+      let assert option.Some(price) = item.price
+
       rows
-      |> item_page.prices(item)
+      // inefficient
+      |> list.append([sql.SelectItemPricesRow(price, time)])
+      |> item_page.prices()
       |> element.to_document_string_builder
       |> wisp.html_response(200)
-    Error(error) ->
-      case error {
-        _ -> wisp.internal_server_error()
-      }
+    }
+    Error(_) -> wisp.internal_server_error()
+  }
+}
+
+pub fn handle_get_market_item_listings(
+  _market_id: String,
+  item_id: String,
+  req: Request,
+  ctx: RequestContext,
+) -> Response {
+  use <- wisp.require_method(req, http.Get)
+  let query = wisp.get_query(req)
+
+  let offset = handling.optional_list_key(query, "offset", "0")
+  let limit = handling.optional_list_key(query, "limit", "25")
+
+  use item_id <- handling.require_int_string(item_id)
+  use limit <- handling.require_int_string(limit)
+  use offset <- handling.require_int_string(offset)
+
+  case internal.get_item_listings(item_id, limit, offset, ctx) {
+    Ok(listings) ->
+      listings
+      |> todo
+      |> element.to_document_string_builder
+      |> wisp.html_response(200)
+    Error(_) -> wisp.internal_server_error()
   }
 }

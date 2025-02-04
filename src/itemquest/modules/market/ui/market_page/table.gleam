@@ -12,46 +12,32 @@ import lustre/element/html
 
 const market_rows_container = "market_rows_container"
 
-pub fn html(filter: MarketItemsFilter) -> Element(t) {
+pub fn html(filter: MarketItemsFilter, market_id: Int) -> Element(t) {
   html.div([], [
-    html.table([attribute.class("w-full")], [
-      html.tbody([attribute.id(market_rows_container)], [
-        html.tr(
-          [
-            attribute.class(
-              "[&>*]:text-start [&>:not(:last-child)]:pr-10 [&>*]:border-b-8 [&>*]:border-bg-color",
-            ),
-          ],
-          [
-            html.th([attribute.class("w-0")], [
-              html.h2([], [html.text("image")]),
-            ]),
-            html.th([], [html.h2([], [html.text("item name")])]),
-            html.th([attribute.class("w-0")], [
-              sorting_header(internal.SortByQuantity, filter),
-            ]),
-            html.th([attribute.class("w-0")], [
-              sorting_header(internal.SortByPopularity, filter),
-            ]),
-            html.th([attribute.class("w-20")], [
-              sorting_header(internal.SortByPrice, filter),
-            ]),
-          ],
+    html.div(
+      [
+        attribute.class("w-full flex flex-col gap-4 mb-5"),
+        attribute.class(
+          "[&>*]:grid [&>*]:grid-cols-[50px_1fr_100px_100px_100px]",
         ),
-        // todo: fix me!
-        html.script(
-          [attribute.type_("module")],
-          "
-                import utils from '@itemquest/utils'
-
-                const url = new URL(window.location.href)
-                url.pathname += '/items'
-                utils.fetchStream(url.toString())
-                ",
-        ),
-      ]),
-    ]),
+        attribute.class("[&>*]:items-center [&>*]:gap-10"),
+        attribute.id(market_rows_container),
+      ],
+      [
+        html.div([], [
+          html.h2([], [html.text("image")]),
+          html.h2([], [html.text("item name")]),
+          sorting_header(internal.SortByQuantity, filter),
+          sorting_header(internal.SortByPopularity, filter),
+          sorting_header(internal.SortByPrice, filter),
+        ]),
+      ],
+    ),
     load_more(filter),
+    ui.eager_loading_frame(
+      [ui.turbo_stream_attribute()],
+      int.to_string(market_id) <> "/items",
+    ),
   ])
 }
 
@@ -65,23 +51,18 @@ pub fn market_items_stream(
 }
 
 fn market_row(item: SelectMarketItemsRow, market_id: Int) -> Element(t) {
-  html.tr(
+  html.a(
     [
-      attribute.class(
-        "[&>*]:text-start [&>:not(:last-child)]:pr-10 [&>*]:p-2 [&>*]:border-y-8 [&>*]:border-bg-color bg-secondary",
-      ),
-      ui.turbo_visit_attribute(
+      attribute.href(
         int.to_string(market_id) <> "/items/" <> int.to_string(item.item_id),
       ),
     ],
     [
-      html.td([], [
-        html.img([attribute.src(item.image_url), attribute.class("h-10")]),
-      ]),
-      html.td([], [html.text(item.name)]),
-      html.td([], [html.text(int.to_string(item.quantity))]),
-      html.td([], [html.text(int.to_string(item.popularity))]),
-      html.td([], [
+      html.img([attribute.src(item.image_url), attribute.class("h-10")]),
+      html.div([], [html.text(item.name)]),
+      html.div([], [html.text(int.to_string(item.quantity))]),
+      html.div([], [html.text(int.to_string(item.popularity))]),
+      html.div([], [
         html.text(case item.price {
           option.Some(price) -> ui.get_string_price(price)
           _ -> "-"

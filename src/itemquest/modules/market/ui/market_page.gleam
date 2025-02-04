@@ -6,7 +6,10 @@ import lustre/element.{type Element}
 import lustre/element/html
 
 pub fn page(market: SelectMarketRow, filter: MarketItemsFilter) -> Element(t) {
-  html.section([], [header.html(market, filter), table.html(filter)])
+  html.section([], [
+    header.html(market, filter),
+    table.html(filter, market.market_id),
+  ])
 }
 
 pub const search_results_stream = header.search_results_stream

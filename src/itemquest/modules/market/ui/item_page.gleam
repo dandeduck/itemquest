@@ -30,7 +30,6 @@ pub fn page(item: SelectMarketItemRow) -> Element(a) {
 
 pub fn prices(
   rows: List(SelectItemPricesRow),
-  item: SelectMarketItemRow,
 ) -> Element(a) {
   let js_values =
     rows
@@ -41,18 +40,8 @@ pub fn prices(
       <> ui.get_string_price(row.price)
       <> "]}"
     })
-  let time = erlang.system_time(erlang.Millisecond)
-  let cuurent_price_segment = case item.price {
-    option.Some(price) ->
-      ",{value:["
-      <> int.to_string(time)
-      <> ","
-      <> ui.get_string_price(price)
-      <> "]}"
-    _ -> ""
-  }
   let js_data =
-    "[" <> string.join(js_values, ",") <> cuurent_price_segment <> "]"
+    "[" <> string.join(js_values, ",") <> "]"
   let js_string =
     "
   import charts from '@itemquest/charts'
@@ -70,4 +59,7 @@ pub fn prices(
       string.replace(js_string, each: "%data%", with: js_data),
     ),
   ])
+}
+
+pub fn listings() -> Element(a) {
 }
