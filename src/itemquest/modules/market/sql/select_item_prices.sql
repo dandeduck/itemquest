@@ -1,7 +1,7 @@
 -- Interval can be 'max', 'hour', 'day'. Based on this runs on the relevant view/table
 SELECT price, extract(epoch from time)::int as timestamp
 FROM market_sales
-WHERE $2 = 'max' AND item_id = $1 AND time >= NOW() - INTERVAL '3 day'
+WHERE $2 = 'max' AND item_id = $1 AND time >= NOW() - INTERVAL '30 day' -- todo fix this to 1 day(?)
 UNION ALL 
 SELECT price, extract(epoch from time)::int as timestamp
 FROM hourly_item_prices

@@ -1,3 +1,5 @@
+import gleam/float
+import gleam/int
 import gleam/option.{type Option}
 import lustre/attribute.{type Attribute}
 import lustre/element.{type Element}
@@ -69,4 +71,8 @@ pub fn icon(name: String, class: Option(String)) -> Element(t) {
 
 pub fn turbo_visit_attribute(path: String) -> Attribute(t) {
   attribute.attribute("data-turbo-visit", path)
+}
+
+pub fn get_string_price(price: Int) -> String {
+    float.to_string(int.to_float(price) /. 100.0)
 }

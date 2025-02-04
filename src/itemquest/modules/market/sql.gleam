@@ -32,8 +32,7 @@ pub fn select_market_item(db, arg_1, arg_2) {
     decode.success(SelectMarketItemRow(item_id:, name:, image_url:, price:))
   }
 
-  let query =
-    "SELECT item_id, name, image_url, price
+  let query = "SELECT item_id, name, image_url, price
 FROM market_items
 WHERE item_id = $1 AND market_id = $2;
 "
@@ -41,6 +40,51 @@ WHERE item_id = $1 AND market_id = $2;
   pog.query(query)
   |> pog.parameter(pog.int(arg_1))
   |> pog.parameter(pog.int(arg_2))
+  |> pog.returning(decoder)
+  |> pog.execute(db)
+}
+
+/// A row you get from running the `select_item_sell_listings` query
+/// defined in `./src/itemquest/modules/market/sql/select_item_sell_listings.sql`.
+///
+/// > 🐿️ This type definition was generated automatically using v3.0.0 of the
+/// > [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub type SelectItemSellListingsRow {
+  SelectItemSellListingsRow(
+    price: Int,
+    avatar_image_url: Option(String),
+    name: Option(String),
+  )
+}
+
+/// Runs the `select_item_sell_listings` query
+/// defined in `./src/itemquest/modules/market/sql/select_item_sell_listings.sql`.
+///
+/// > 🐿️ This function was generated automatically using v3.0.0 of
+/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub fn select_item_sell_listings(db, arg_1, arg_2, arg_3) {
+  let decoder = {
+    use price <- decode.field(0, decode.int)
+    use avatar_image_url <- decode.field(1, decode.optional(decode.string))
+    use name <- decode.field(2, decode.optional(decode.string))
+    decode.success(SelectItemSellListingsRow(price:, avatar_image_url:, name:))
+  }
+
+  let query = "SELECT market_listings.price, users.avatar_image_url, users.name
+FROM market_listings
+LEFT JOIN users
+ON market_listings.user_id = users.user_id
+WHERE market_listings.item_id = $1 AND market_listings.listing_type = 'sell'
+ORDER BY market_listings.price DESC
+LIMIT $2 OFFSET $3;
+"
+
+  pog.query(query)
+  |> pog.parameter(pog.int(arg_1))
+  |> pog.parameter(pog.int(arg_2))
+  |> pog.parameter(pog.int(arg_3))
   |> pog.returning(decoder)
   |> pog.execute(db)
 }
@@ -67,8 +111,7 @@ pub fn select_market_item_names(db, arg_1, arg_2) {
     decode.success(SelectMarketItemNamesRow(name:, rank:))
   }
 
-  let query =
-    "
+  let query = "
 -- Select market item names with (name)
 SELECT name, ts_rank(name_search, to_tsquery($2)) as rank
 FROM market_items 
@@ -106,8 +149,7 @@ pub fn select_hourly_item_prices(db, arg_1) {
     decode.success(SelectHourlyItemPricesRow(price:, time:))
   }
 
-  let query =
-    "-- Selects all price+time rows by (item_id) using hourly_item_prices view
+  let query = "-- Selects all price+time rows by (item_id) using hourly_item_prices view
 SELECT price, time
 FROM hourly_item_prices
 WHERE item_id = $1;
@@ -148,17 +190,12 @@ pub fn select_market(db, arg_1) {
     use name <- decode.field(2, decode.string)
     use image_url <- decode.field(3, decode.optional(decode.string))
     use created_at <- decode.field(4, decode.optional(pog.timestamp_decoder()))
-    decode.success(SelectMarketRow(
-      market_id:,
-      status:,
-      name:,
-      image_url:,
-      created_at:,
-    ))
+    decode.success(
+      SelectMarketRow(market_id:, status:, name:, image_url:, created_at:),
+    )
   }
 
-  let query =
-    "SELECT * FROM markets WHERE market_id = $1
+  let query = "SELECT * FROM markets WHERE market_id = $1
 "
 
   pog.query(query)
@@ -197,18 +234,19 @@ pub fn select_market_items(db, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6) {
     use quantity <- decode.field(3, decode.int)
     use popularity <- decode.field(4, decode.int)
     use price <- decode.field(5, decode.optional(decode.int))
-    decode.success(SelectMarketItemsRow(
-      item_id:,
-      name:,
-      image_url:,
-      quantity:,
-      popularity:,
-      price:,
-    ))
+    decode.success(
+      SelectMarketItemsRow(
+        item_id:,
+        name:,
+        image_url:,
+        quantity:,
+        popularity:,
+        price:,
+      ),
+    )
   }
 
-  let query =
-    "-- Select market items with (market_id, search, sort_by, sort_direction, limit, offset)
+  let query = "-- Select market items with (market_id, search, sort_by, sort_direction, limit, offset)
 SELECT item_id, name, image_url, quantity, popularity, price
 FROM market_items 
 WHERE market_id = $1 AND CASE WHEN $2 != '' THEN name_search @@ to_tsquery($2) ELSE TRUE END
@@ -255,11 +293,10 @@ pub fn select_item_prices(db, arg_1, arg_2) {
     decode.success(SelectItemPricesRow(price:, timestamp:))
   }
 
-  let query =
-    "-- Interval can be 'max', 'hour', 'day'. Based on this runs on the relevant view/table
+  let query = "-- Interval can be 'max', 'hour', 'day'. Based on this runs on the relevant view/table
 SELECT price, extract(epoch from time)::int as timestamp
 FROM market_sales
-WHERE $2 = 'max' AND item_id = $1 AND time >= NOW() - INTERVAL '3 day'
+WHERE $2 = 'max' AND item_id = $1 AND time >= NOW() - INTERVAL '30 day' -- todo fix this to 1 day(?)
 UNION ALL 
 SELECT price, extract(epoch from time)::int as timestamp
 FROM hourly_item_prices
@@ -300,8 +337,7 @@ pub fn select_daily_item_prices(db, arg_1) {
     decode.success(SelectDailyItemPricesRow(price:, time:))
   }
 
-  let query =
-    "-- Selects all price+time rows by (item_id) using daily_item_prices view
+  let query = "-- Selects all price+time rows by (item_id) using daily_item_prices view
 SELECT price, time
 FROM daily_item_prices
 WHERE item_id = $1;

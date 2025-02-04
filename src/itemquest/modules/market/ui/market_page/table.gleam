@@ -1,4 +1,3 @@
-import gleam/float
 import gleam/int
 import gleam/list
 import gleam/option.{type Option}
@@ -84,7 +83,7 @@ fn market_row(item: SelectMarketItemsRow, market_id: Int) -> Element(t) {
       html.td([], [html.text(int.to_string(item.popularity))]),
       html.td([], [
         html.text(case item.price {
-          option.Some(price) -> float.to_string(int.to_float(price) /. 100.0)
+          option.Some(price) -> ui.get_string_price(price)
           _ -> "-"
         }),
       ]),

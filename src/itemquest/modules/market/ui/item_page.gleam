@@ -1,5 +1,4 @@
 import gleam/erlang
-import gleam/float
 import gleam/int
 import gleam/list
 import gleam/option
@@ -39,7 +38,7 @@ pub fn prices(
       "{value:["
       <> int.to_string(row.timestamp)
       <> "000,"
-      <> float.to_string(int.to_float(row.price) /. 100.0)
+      <> ui.get_string_price(row.price)
       <> "]}"
     })
   let time = erlang.system_time(erlang.Millisecond)
@@ -48,7 +47,7 @@ pub fn prices(
       ",{value:["
       <> int.to_string(time)
       <> ","
-      <> float.to_string(int.to_float(price) /. 100.0)
+      <> ui.get_string_price(price)
       <> "]}"
     _ -> ""
   }

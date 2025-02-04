@@ -4,8 +4,8 @@ import gleam/result
 import gleam/string
 import gleam/uri
 import itemquest/modules/market/sql.{
-  type SelectItemPricesRow, type SelectMarketItemRow, type SelectMarketItemsRow,
-  type SelectMarketRow,
+  type SelectItemPricesRow, type SelectItemSellListingsRow,
+  type SelectMarketItemRow, type SelectMarketItemsRow, type SelectMarketRow,
 }
 import itemquest/web/contexts.{type RequestContext}
 import itemquest/web/errors.{type InternalError}
@@ -214,6 +214,20 @@ pub fn get_item_prices(
 
   use _, rows <- errors.try_query(
     sql.select_item_prices(ctx.db, item_id, interval),
+    ctx,
+  )
+
+  Ok(rows)
+}
+
+pub fn get_item_listings(
+  item_id: Int,
+  limit: Int,
+  offset: Int,
+  ctx: RequestContext,
+) -> Result(List(SelectItemSellListingsRow), InternalError(Nil)) {
+  use _, rows <- errors.try_query(
+    sql.select_item_sell_listings(ctx.db, item_id, limit, offset),
     ctx,
   )
 
