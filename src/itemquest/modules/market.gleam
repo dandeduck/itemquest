@@ -233,7 +233,7 @@ pub fn handle_get_market_item_listings(
   case internal.get_item_listings(item_id, limit, offset, ctx) {
     Ok(listings) ->
       listings
-      |> todo
+      |> item_page.listings()
       |> element.to_document_string_builder
       |> wisp.html_response(200)
     Error(_) -> wisp.internal_server_error()

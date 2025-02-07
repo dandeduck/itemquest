@@ -51,8 +51,8 @@ CREATE TABLE market_items (
 );
 
 CREATE TABLE users (
-    user_id   serial PRIMARY KEY,
-    name      varchar(31) NOT NULL,
+    user_id          serial PRIMARY KEY,
+    name             varchar(31) NOT NULL,
     avatar_image_url varchar(255) NOT NULL
 );
 
