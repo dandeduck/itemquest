@@ -22,7 +22,6 @@ pub fn page() -> Element(t) {
       html.form(
         [
           attribute.enctype("multipart/form-data"),
-          attribute.action("/waitlist"),
           attribute.method("post"),
           attribute.class("flex flex-col gap-3 my-20 max-w-[660px]"),
         ],

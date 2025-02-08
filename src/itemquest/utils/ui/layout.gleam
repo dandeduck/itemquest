@@ -86,9 +86,11 @@ fn main(page: Element(t)) -> Element(t) {
 fn header() -> Element(t) {
   html.header([attribute.class("px-10 py-6 mb-10")], [
     html.div([attribute.class("flex justify-between items-center")], [
-      html.img([
-        attribute.src("/public/icons/logo-mini.svg"),
-        attribute.class("w-9"),
+      html.a([attribute.href("/")], [
+        html.img([
+          attribute.src("/public/icons/logo-mini.svg"),
+          attribute.class("w-9"),
+        ]),
       ]),
       html.div([attribute.class("flex gap-5 [&>*]:w-6")], [
         html.button([attribute.attribute("onclick", "setDarkTheme()")], [
