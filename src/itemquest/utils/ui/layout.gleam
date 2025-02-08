@@ -84,7 +84,7 @@ fn main(page: Element(t)) -> Element(t) {
 }
 
 fn header() -> Element(t) {
-  html.header([attribute.class("p-6 mb-10")], [
+  html.header([attribute.class("px-10 py-6 mb-10")], [
     html.div([attribute.class("flex justify-between items-center")], [
       html.img([
         attribute.src("/public/icons/logo-mini.svg"),

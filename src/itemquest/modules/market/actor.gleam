@@ -1,6 +1,6 @@
 import gleam/erlang/process
 import gleam/otp/actor.{type Next}
-import itemquest/modules/market/internal
+import itemquest/modules/market/submodules/item
 import itemquest/utils/logging
 import itemquest/web/contexts.{type RequestContext}
 import itemquest/web/errors.{type InternalError}
@@ -22,7 +22,7 @@ fn handle_message(
     Shutdown -> actor.Stop(process.Normal)
     CreateMarketItem(item_id, ctx) -> {
       logging.log_info("Incomming CreateMarketItem message", ctx)
-      internal.create_market_item(item_id, ctx)
+      item.create_market_item(item_id, ctx)
       |> handle_result(ctx, message, failed_messages)
     }
   }

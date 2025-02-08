@@ -2,7 +2,7 @@ import gleam/int
 import gleam/list
 import gleam/option
 import gleam/string
-import itemquest/modules/market/sql.{
+import itemquest/modules/market/submodules/item/sql.{
   type SelectItemPricesRow, type SelectItemSellListingsRow,
   type SelectMarketItemRow,
 }
@@ -58,7 +58,7 @@ pub fn prices(rows: List(SelectItemPricesRow)) -> Element(a) {
 
   ui.turbo_frame([attribute.id(prices_id)], [
     html.div(
-      [attribute.id("prices_chart"), attribute.class("w-full h-64")],
+      [attribute.id("prices_chart"), attribute.class("w-full h-64 md:h-full")],
       [],
     ),
     html.script(
@@ -81,9 +81,9 @@ fn listing_row(listing_row: SelectItemSellListingsRow) -> Element(a) {
   let assert option.Some(user_name) = listing_row.name
 
   html.div(
-    [attribute.class("grid grid-cols-[50px_1fr_50px_75px] gap-10 items-center")],
+    [attribute.class("grid grid-cols-[50px_1fr_50px_75px] gap-5 items-center")],
     [
-      html.img([attribute.src(avatar), attribute.class("rounded")]),
+      html.img([attribute.src(avatar), attribute.class("rounded-full")]),
       html.p([], [html.text(user_name)]),
       html.p([], [html.text(ui.get_string_price(listing_row.price))]),
       html.button([], [html.text("Buy")]),
