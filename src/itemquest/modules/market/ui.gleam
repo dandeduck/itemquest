@@ -1,6 +1,6 @@
 import itemquest/modules/market/ui/header
-import itemquest/modules/market/ui/table
 import itemquest/modules/market/ui/page
+import itemquest/modules/market/ui/table
 
 pub const page = page.html
 

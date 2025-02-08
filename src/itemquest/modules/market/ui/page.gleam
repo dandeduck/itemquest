@@ -8,4 +8,3 @@ import lustre/element/html
 pub fn html(market: SelectMarketRow, filter: MarketItemsFilter) -> Element(t) {
   html.section([], [header.html(market, filter), table.frame(filter)])
 }
-

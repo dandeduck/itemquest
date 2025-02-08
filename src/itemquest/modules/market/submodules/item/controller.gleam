@@ -1,12 +1,12 @@
+import gleam/http
+import itemquest/modules/market/submodules/item/internal
+import itemquest/modules/market/submodules/item/ui
+import itemquest/utils/handling
+import itemquest/utils/ui/layout
+import itemquest/web/contexts.{type RequestContext}
 import itemquest/web/errors
 import lustre/element
-import itemquest/utils/ui/layout
-import itemquest/utils/handling
-import gleam/http
 import wisp.{type Request, type Response}
-import itemquest/web/contexts.{type RequestContext}
-import itemquest/modules/market/submodules/item/ui
-import itemquest/modules/market/submodules/item/internal
 
 pub fn handle_get_market_item(
   market_id: Int,
