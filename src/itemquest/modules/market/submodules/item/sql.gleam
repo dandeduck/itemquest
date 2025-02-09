@@ -32,8 +32,7 @@ pub fn select_market_item(db, arg_1, arg_2) {
     decode.success(SelectMarketItemRow(item_id:, name:, image_url:, price:))
   }
 
-  let query =
-    "SELECT item_id, name, image_url, price
+  let query = "SELECT item_id, name, image_url, price
 FROM market_items
 WHERE item_id = $1 AND market_id = $2;
 "
@@ -41,6 +40,27 @@ WHERE item_id = $1 AND market_id = $2;
   pog.query(query)
   |> pog.parameter(pog.int(arg_1))
   |> pog.parameter(pog.int(arg_2))
+  |> pog.returning(decoder)
+  |> pog.execute(db)
+}
+
+/// Runs the `insert_market_item` query
+/// defined in `./src/itemquest/modules/market/submodules/item/sql/insert_market_item.sql`.
+///
+/// > 🐿️ This function was generated automatically using v3.0.0 of
+/// > the [squirrel package](https://github.com/giacomocavalieri/squirrel).
+///
+pub fn insert_market_item(db, arg_1) {
+  let decoder = decode.map(decode.dynamic, fn(_) { Nil })
+
+  let query = "INSERT INTO market_items(item_id, market_id, name, image_url)
+SELECT item_id, market_id, name, image_url
+FROM items
+WHERE item_id = $1
+"
+
+  pog.query(query)
+  |> pog.parameter(pog.int(arg_1))
   |> pog.returning(decoder)
   |> pog.execute(db)
 }
@@ -73,8 +93,7 @@ pub fn select_item_sell_listings(db, arg_1, arg_2, arg_3) {
     decode.success(SelectItemSellListingsRow(price:, avatar_image_url:, name:))
   }
 
-  let query =
-    "SELECT price, avatar_image_url, name
+  let query = "SELECT price, avatar_image_url, name
 FROM market_listings
 LEFT JOIN users ON market_listings.user_id = users.user_id
 WHERE item_id = $1 AND listing_type = 'sell'
@@ -112,8 +131,7 @@ pub fn select_item_prices(db, arg_1, arg_2) {
     decode.success(SelectItemPricesRow(price:, timestamp:))
   }
 
-  let query =
-    "-- Interval can be 'max', 'hour', 'day'. Based on this runs on the relevant view/table
+  let query = "-- Interval can be 'max', 'hour', 'day'. Based on this runs on the relevant view/table
 (
     SELECT price, extract(epoch from time)::int as timestamp
     FROM market_sales

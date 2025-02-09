@@ -7,10 +7,13 @@ import itemquest/web/contexts.{type RequestContext}
 import itemquest/web/errors.{type InternalError}
 
 pub fn create_market_item(
-  _item_id: Int,
-  _ctx: RequestContext,
+  item_id: Int,
+  ctx: RequestContext,
 ) -> Result(Nil, InternalError(Nil)) {
-  todo
+  use _, _ <- errors.try_query(sql.insert_market_item(ctx.db, item_id), ctx)
+  // todo, in case no row is returned, return business error
+
+  Ok(Nil)
 }
 
 pub type GetMarketItemError {

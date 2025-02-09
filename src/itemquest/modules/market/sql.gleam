@@ -24,8 +24,7 @@ pub fn select_market_item_names(db, arg_1, arg_2) {
     decode.success(SelectMarketItemNamesRow(name:, rank:))
   }
 
-  let query =
-    "
+  let query = "
 -- Select market item names with (name)
 SELECT name, ts_rank(name_search, to_tsquery($2)) as rank
 FROM market_items 
@@ -70,17 +69,12 @@ pub fn select_market(db, arg_1) {
     use name <- decode.field(2, decode.string)
     use image_url <- decode.field(3, decode.optional(decode.string))
     use created_at <- decode.field(4, decode.optional(pog.timestamp_decoder()))
-    decode.success(SelectMarketRow(
-      market_id:,
-      status:,
-      name:,
-      image_url:,
-      created_at:,
-    ))
+    decode.success(
+      SelectMarketRow(market_id:, status:, name:, image_url:, created_at:),
+    )
   }
 
-  let query =
-    "SELECT * FROM markets WHERE market_id = $1
+  let query = "SELECT * FROM markets WHERE market_id = $1
 "
 
   pog.query(query)
@@ -119,18 +113,19 @@ pub fn select_market_items(db, arg_1, arg_2, arg_3, arg_4, arg_5, arg_6) {
     use quantity <- decode.field(3, decode.int)
     use popularity <- decode.field(4, decode.int)
     use price <- decode.field(5, decode.optional(decode.int))
-    decode.success(SelectMarketItemsRow(
-      item_id:,
-      name:,
-      image_url:,
-      quantity:,
-      popularity:,
-      price:,
-    ))
+    decode.success(
+      SelectMarketItemsRow(
+        item_id:,
+        name:,
+        image_url:,
+        quantity:,
+        popularity:,
+        price:,
+      ),
+    )
   }
 
-  let query =
-    "-- Select market items with (market_id, search, sort_by, sort_direction, limit, offset)
+  let query = "-- Select market items with (market_id, search, sort_by, sort_direction, limit, offset)
 SELECT item_id, name, image_url, quantity, popularity, price
 FROM market_items 
 WHERE market_id = $1 AND CASE WHEN $2 != '' THEN name_search @@ to_tsquery($2) ELSE TRUE END
