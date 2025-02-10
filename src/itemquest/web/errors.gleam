@@ -1,12 +1,19 @@
+import gleam/string
 import itemquest/utils/logging
 import itemquest/web/contexts.{type RequestContext}
 import pog.{type QueryError}
+import radish/error as cache_error
 
 pub type InternalError(t) {
   Business(message: String, data: t)
   Operational(message: String)
 }
 
+pub fn from_cache_error(error: cache_error.Error) -> InternalError(t) {
+  error |> cache_error_message |> Operational
+}
+
+// Any errors will be treated as Operational errors
 pub fn try_query(
   result: Result(pog.Returned(t), QueryError),
   ctx: RequestContext,
@@ -37,8 +44,17 @@ pub fn from_query_error(error: QueryError) -> InternalError(t) {
   |> Operational
 }
 
+fn cache_error_message(error: cache_error.Error) -> String {
+  "Cache - "
+  <> case error {
+    cache_error.ServerError(message) -> "ServerError: " <> message
+    _ -> string.inspect(error)
+  }
+}
+
 fn query_error_message(error: QueryError) -> String {
-  case error {
+  "DB - "
+  <> case error {
     pog.ConstraintViolated(message, constraint, detail) ->
       "DB constraint violated: '"
       <> constraint

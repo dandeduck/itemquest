@@ -25,6 +25,7 @@ pub type RequestContext {
     db: Connection,
     request_id: String,
     auth: Authentication,
+    cache: Client,
     secrets: Secrets,
   )
 }

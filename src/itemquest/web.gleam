@@ -83,6 +83,7 @@ fn create_context(
   let context =
     contexts.RequestContext(
       db: server_ctx.db,
+      cache: server_ctx.cache,
       request_id: request_id(),
       auth: contexts.Unauthenticated,
       secrets: server_ctx.secrets,
