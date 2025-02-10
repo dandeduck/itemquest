@@ -75,14 +75,18 @@ fn log_request(
   response
 }
 
-const test_user_id = "kjsdnfukyh2873h2uifhusgefhisdf"
-
 fn create_context(
   _req: Request,
   server_ctx: ServerContext,
   handle_request: fn(RequestContext) -> Response,
 ) -> Response {
-  let context = contexts.Authorized(server_ctx.db, request_id(), test_user_id)
+  let context =
+    contexts.RequestContext(
+      db: server_ctx.db,
+      request_id: request_id(),
+      auth: contexts.Unauthenticated,
+      secrets: server_ctx.secrets,
+    )
 
   handle_request(context)
 }

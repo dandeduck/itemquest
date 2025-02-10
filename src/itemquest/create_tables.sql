@@ -51,7 +51,7 @@ CREATE TABLE market_items (
 );
 
 CREATE TABLE users (
-    user_id          serial PRIMARY KEY,
+    user_id          uuid PRIMARY KEY,
     name             varchar(31) NOT NULL,
     avatar_image_url varchar(255) NOT NULL
 );
@@ -60,7 +60,7 @@ CREATE TABLE market_listings (
     item_instance_id serial PRIMARY KEY REFERENCES item_instances,
     item_id          serial REFERENCES items,
     market_id        serial REFERENCES markets,
-    user_id          serial REFERENCES users,
+    user_id          uuid REFERENCES users,
     listing_type     listing_type NOT NULL,
     price            integer NOT NULL CHECK (price > 3),
     created_at       timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
@@ -71,8 +71,8 @@ CREATE TABLE market_sales (
     item_instance_id serial REFERENCES item_instances,
     item_id          serial REFERENCES items,
     market_id        serial REFERENCES markets,
-    from_user_id     serial REFERENCES users,
-    to_user_id       serial REFERENCES users,
+    from_user_id     uuid REFERENCES users,
+    to_user_id       uuid REFERENCES users,
     price            integer NOT NULL CHECK (price > 0),
     time             timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 );

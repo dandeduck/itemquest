@@ -19,10 +19,16 @@ pub fn main() {
 
   let assert Ok(secret_key_base) = env.get_string("SECRET_KEY_BASE")
   let assert Ok(db_url) = env.get_string("DATABASE_URL")
+  let assert Ok(jwt_secret) = env.get_string("JWT_SECRET")
 
   let assert Ok(db) = connect_db(db_url)
 
-  let ctx = contexts.ServerContext(priv_directory(), db)
+  let ctx =
+    contexts.ServerContext(
+      priv_directory(),
+      db,
+      contexts.Secrets(jwt: jwt_secret),
+    )
 
   let assert Ok(_) =
     wisp_mist.handler(router.handle_request(_, ctx), secret_key_base)

@@ -1,10 +1,24 @@
 import pog.{type Connection}
 
+pub type Secrets {
+  Secrets(jwt: String)
+}
+
 pub type ServerContext {
-  ServerContext(priv_directory: String, db: Connection)
+  ServerContext(priv_directory: String, db: Connection, secrets: Secrets)
+}
+
+pub type Authentication {
+  Unauthenticated
+  PlatformUser(user_id: String)
+  ApiClient(client_id: String)
 }
 
 pub type RequestContext {
-  Unauthorized(db: Connection, request_id: String)
-  Authorized(db: Connection, request_id: String, user_id: String)
+  RequestContext(
+    db: Connection,
+    request_id: String,
+    auth: Authentication,
+    secrets: Secrets,
+  )
 }
