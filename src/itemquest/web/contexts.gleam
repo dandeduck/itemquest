@@ -1,11 +1,17 @@
 import pog.{type Connection}
+import radish/client.{type Client}
 
 pub type Secrets {
   Secrets(jwt: String)
 }
 
 pub type ServerContext {
-  ServerContext(priv_directory: String, db: Connection, secrets: Secrets)
+  ServerContext(
+    priv_directory: String,
+    db: Connection,
+    cache: Client,
+    secrets: Secrets,
+  )
 }
 
 pub type Authentication {
