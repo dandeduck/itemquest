@@ -18,13 +18,7 @@ pub fn handle_request(
       controller.get_market_items_search(market_id, req, ctx)
     ["items", item_id, ..segments] -> {
       use item_id <- handling.require_int_string(item_id)
-      item.handle_request(item.HandleRequestParams(
-        market_id:,
-        item_id:,
-        req:,
-        ctx:,
-        relative_segments: segments,
-      ))
+      item.handle_request(market_id:, item_id:, req:, ctx:, segments:)
     }
     _ -> wisp.not_found()
   }

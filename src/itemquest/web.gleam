@@ -100,7 +100,7 @@ fn request_id() -> String {
   case result {
     Ok(id) -> id
     Error(error) -> {
-      wisp.log_error(backup_request_id <> error)
+      wisp.log_error("Operational: " <> backup_request_id <> error.message)
       backup_request_id
     }
   }

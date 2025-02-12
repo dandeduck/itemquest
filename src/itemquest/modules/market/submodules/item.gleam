@@ -3,20 +3,13 @@ import itemquest/modules/market/submodules/item/internal
 import itemquest/web/contexts.{type RequestContext}
 import wisp.{type Request, type Response}
 
-pub type HandleRequestParams {
-  HandleRequestParams(
-    market_id: Int,
-    item_id: Int,
-    relative_segments: List(String),
-    req: Request,
-    ctx: RequestContext,
-  )
-}
-
-pub fn handle_request(params: HandleRequestParams) -> Response {
-  let HandleRequestParams(market_id, item_id, relative_segments, req, ctx) =
-    params
-
+pub fn handle_request(
+  market_id market_id: Int,
+  item_id item_id: Int,
+  segments relative_segments: List(String),
+  req req: Request,
+  ctx ctx: RequestContext,
+) -> Response {
   case relative_segments {
     [] -> controller.handle_get_market_item(market_id, item_id, req, ctx)
     ["prices"] -> controller.handle_get_market_item_prices(item_id, req, ctx)

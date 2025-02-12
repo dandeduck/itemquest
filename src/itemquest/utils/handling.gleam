@@ -65,3 +65,11 @@ pub fn turbo_stream_html_response(body: StringTree, status: Int) -> Response {
     _,
   )
 }
+
+pub fn unauthorized() -> Response {
+  wisp.response(401)
+}
+
+pub fn forbidden() -> Response {
+  wisp.response(403)
+}

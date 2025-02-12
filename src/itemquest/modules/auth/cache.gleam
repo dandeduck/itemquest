@@ -7,10 +7,17 @@ import radish/command
 pub fn token_exists(
   token_id: String,
   ctx: RequestContext,
-) -> Result(Bool, InternalError(Nil)) {
-  use exists <- result.try(cache.key_exists(token_id, ctx))
+) -> Result(Bool, InternalError(t)) {
+  cache.key_exists(token_id, ctx)
+}
 
-  Ok(exists)
+pub fn delete_token(
+  token_id: String,
+  ctx: RequestContext,
+) -> Result(Nil, InternalError(t)) {
+  use _ <- result.try(cache.del(token_id, ctx))
+
+  Ok(Nil)
 }
 
 pub fn save_token(
@@ -18,7 +25,7 @@ pub fn save_token(
   token token: String,
   ttl time_to_live: Int,
   ctx ctx: RequestContext,
-) -> Result(Nil, InternalError(Nil)) {
+) -> Result(Nil, InternalError(t)) {
   use _ <- result.try(cache.set(
     token_id,
     token,

@@ -44,3 +44,14 @@ pub fn key_exists(
       |> Error
   }
 }
+
+pub fn del(key: String, ctx: RequestContext) -> Result(Bool, InternalError(a)) {
+  case radish.del(ctx.cache, [key], default_timeout) {
+    Ok(num) -> Ok(num == 1)
+    Error(error) ->
+      error
+      |> errors.from_cache_error
+      |> errors.log_internal_error(ctx)
+      |> Error
+  }
+}
