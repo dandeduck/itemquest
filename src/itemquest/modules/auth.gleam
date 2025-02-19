@@ -1,5 +1,6 @@
 import itemquest/modules/auth/controller
 import itemquest/modules/auth/internal
+import itemquest/modules/auth/middleware
 import itemquest/web/contexts.{type Authentication, type RequestContext}
 import wisp.{type Request, type Response}
 
@@ -20,3 +21,6 @@ pub fn handle_request(
     _ -> wisp.not_found()
   }
 }
+
+pub const require_platform_authorized = middleware.require_platform_authorized
+pub const require_api_authorized = middleware.require_api_authorized

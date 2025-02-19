@@ -1,4 +1,4 @@
-FROM ghcr.io/gleam-lang/gleam:v1.6.3-erlang-alpine
+FROM ghcr.io/gleam-lang/gleam:v1.8.1-erlang-alpine
 
 # Add project code
 COPY . /build/

@@ -1,15 +1,25 @@
 import gleam/result
-import gleam/string
-import ids/uuid
 import itemquest/web/errors.{type InternalError}
+import youid/uuid
 
-pub fn generate_id() -> Result(String, InternalError(t)) {
-  use id <- result.try(
-    uuid.generate_v4()
-    |> result.map_error(fn(error) { errors.Operational(error) }),
-  )
+pub type Uuid =
+  uuid.Uuid
 
-  id
-  |> string.replace("-", "")
-  |> Ok
+pub fn generate_id() -> String {
+  uuid.v4() |> format
+}
+
+pub fn format(id: Uuid) -> String {
+  id |> uuid.format(uuid.Hex)
+}
+
+pub type ParseIdError {
+  InvalidIdString
+}
+
+pub fn parse_id(id: String) -> Result(Uuid, InternalError(ParseIdError)) {
+  uuid.from_string(id)
+  |> result.map_error(fn(_) {
+    errors.Business("Passed ID's format is incorrect", InvalidIdString)
+  })
 }

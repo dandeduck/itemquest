@@ -124,7 +124,7 @@ fn generate_token(
     Api -> "api"
   }
 
-  use token_id <- result.try(ids.generate_id())
+  let token_id = ids.generate_id()
   let expiration = { time_seconds + ttl_seconds } * 1000
 
   let token =

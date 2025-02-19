@@ -15,7 +15,7 @@ pub fn require_form_key(
 }
 
 pub fn require_ok_result(
-  result: Result(t, Nil),
+  result: Result(t, e),
   handle_request: fn(t) -> Response,
 ) -> Response {
   case result {

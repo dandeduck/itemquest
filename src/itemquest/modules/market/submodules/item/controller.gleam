@@ -8,7 +8,7 @@ import itemquest/web/errors
 import lustre/element
 import wisp.{type Request, type Response}
 
-pub fn handle_get_market_item(
+pub fn get_market_item(
   market_id: Int,
   item_id: Int,
   req: Request,
@@ -32,7 +32,7 @@ pub fn handle_get_market_item(
   }
 }
 
-pub fn handle_get_market_item_prices(
+pub fn get_market_item_prices(
   item_id: Int,
   req: Request,
   ctx: RequestContext,
@@ -55,7 +55,7 @@ pub fn handle_get_market_item_prices(
   }
 }
 
-pub fn handle_get_market_item_listings(
+pub fn get_market_item_listings(
   item_id: Int,
   req: Request,
   ctx: RequestContext,

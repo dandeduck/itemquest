@@ -31,8 +31,8 @@ pub fn log_internal_error(
   ctx: RequestContext,
 ) -> InternalError(t) {
   case error {
-    Business(message, _) -> logging.log_warning("Business: " <> message, ctx)
-    Operational(message) -> logging.log_error("Operational: " <> message, ctx)
+    Business(_, _) -> error |> string.inspect |> logging.log_warning(ctx)
+    Operational(_) -> error |> string.inspect |> logging.log_error(ctx)
   }
 
   error

@@ -11,12 +11,10 @@ pub fn handle_request(
   ctx ctx: RequestContext,
 ) -> Response {
   case relative_segments {
-    [] -> controller.handle_get_market_item(market_id, item_id, req, ctx)
-    ["prices"] -> controller.handle_get_market_item_prices(item_id, req, ctx)
-    ["listings"] ->
-      controller.handle_get_market_item_listings(item_id, req, ctx)
+    [] -> controller.get_market_item(market_id, item_id, req, ctx)
+    ["prices"] -> controller.get_market_item_prices(item_id, req, ctx)
+    ["listings"] -> controller.get_market_item_listings(item_id, req, ctx)
     _ -> wisp.not_found()
-    // todo: 404
   }
 }
 

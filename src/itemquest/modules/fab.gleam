@@ -1,14 +1,5 @@
-import itemquest/modules/fab/sql
-import itemquest/web/contexts.{type RequestContext}
-import itemquest/web/errors.{type InternalError}
+import itemquest/modules/fab/internal
 
-pub fn create_item(
-  ctx: RequestContext,
-  market_id: Int,
-  name: String,
-) -> Result(Int, InternalError(Nil)) {
-  use _, rows <- errors.try_query(sql.insert_item(ctx.db, market_id, name), ctx)
-  let assert [row] = rows
+pub const create_item = internal.create_item
+pub const update_item_instance_owner = internal.update_item_instance_owner
 
-  Ok(row.item_id)
-}

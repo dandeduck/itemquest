@@ -84,7 +84,7 @@ fn create_context(
     contexts.RequestContext(
       db: server_ctx.db,
       cache: server_ctx.cache,
-      request_id: request_id(),
+      request_id: ids.generate_id(),
       auth: contexts.Unauthenticated,
       secrets: server_ctx.secrets,
     )
@@ -92,16 +92,3 @@ fn create_context(
   handle_request(context)
 }
 
-const backup_request_id = "no_request_id"
-
-fn request_id() -> String {
-  let result = ids.generate_id()
-
-  case result {
-    Ok(id) -> id
-    Error(error) -> {
-      wisp.log_error("Operational: " <> backup_request_id <> error.message)
-      backup_request_id
-    }
-  }
-}
